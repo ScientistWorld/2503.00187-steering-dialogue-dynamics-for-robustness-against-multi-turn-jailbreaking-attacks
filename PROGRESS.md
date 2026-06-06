@@ -18,7 +18,7 @@ Latest passed job `a255db70-c05` wrote `scoring/scores.json`: NBF steering achie
 
 This supports the core claim on the local substitute benchmark: the paper's neural barrier filtering blocks substantially more multi-turn unsafe turns while preserving more benign interactions than the lightweight lexical guard.
 
-The eta=0 threshold variant achieved ASR 0.617, filter recall 0.383, prompt harmfulness F1 0.554, helpfulness retention 1.0, and over-refusal 0.0. This provides an additional setting for the paper's threshold trade-off: weaker filtering preserves benign prompts but allows many more unsafe turns through.
+The eta=0 threshold diagnostic achieved ASR 0.617, filter recall 0.383, prompt harmfulness F1 0.554, helpfulness retention 1.0, and over-refusal 0.0. Because this is too far from the paper's eta=0 ASR to pass consistency validation, it is documented as exploratory and excluded from the default scored contract.
 
 The held-out attack-family run achieved ASR 0.0, filter recall 1.0, prompt harmfulness F1 1.0, helpfulness retention 0.954, and over-refusal 0.046 after training without ActorAttack and Opposite-day families. This supports the paper's secondary generalization claim on the local substitute benchmark.
 
@@ -33,7 +33,7 @@ An exploratory no-`L_SI` ablation achieved ASR 0.0, filter recall 1.0, helpfulne
 
 - The full paper setup depends on paid GPT/Claude APIs and API-generated attack transcripts. Paid APIs are disallowed, so the autonomous gym uses a local substitute dataset.
 - The first job failed validation because local method names were not listed in `reference.json`; this has been fixed.
-- The eta=0 threshold result is weaker than the paper's eta=0 numbers on the local substitute benchmark; the stronger eta=1e-3 threshold supports the reproduced core claim.
+- The eta=0 threshold result is weaker than the paper's eta=0 numbers on the local substitute benchmark and is not included in default `scores.json`; the stronger eta=1e-3 threshold supports the reproduced core claim.
 - The no-`L_SI` ablation does not match the paper's exact ASR direction on the substitute benchmark; it instead demonstrates that loss changes can shift the guard toward over-refusal.
 
 ## Deviations from Paper

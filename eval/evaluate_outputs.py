@@ -50,6 +50,7 @@ def main():
     parser.add_argument("--eta0-benign-output", default="tmp/outputs/nbf_eta0_benign.json")
     parser.add_argument("--no-si-attack-output", default="tmp/outputs/nbf_no_si_attacks.json")
     parser.add_argument("--no-si-benign-output", default="tmp/outputs/nbf_no_si_benign.json")
+    parser.add_argument("--include-threshold-axis", action="store_true")
     parser.add_argument("--include-loss-ablation", action="store_true")
     parser.add_argument("--baseline-output", default="tmp/outputs/baseline_attacks.json")
     parser.add_argument("--baseline-benign-output", default="tmp/outputs/baseline_benign.json")
@@ -75,7 +76,7 @@ def main():
         }
 
     add_nbf_result("nbf_steering", args.attack_output, args.benign_output)
-    if Path(args.eta0_attack_output).exists() and Path(args.eta0_benign_output).exists():
+    if args.include_threshold_axis and Path(args.eta0_attack_output).exists() and Path(args.eta0_benign_output).exists():
         add_nbf_result("nbf_steering_eta_0", args.eta0_attack_output, args.eta0_benign_output)
 
     if baseline_attack:

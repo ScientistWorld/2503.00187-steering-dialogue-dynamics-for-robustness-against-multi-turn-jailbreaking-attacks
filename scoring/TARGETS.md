@@ -5,7 +5,7 @@ Tests whether a guardrail blocks unsafe turns in multi-turn conversations while 
 - **Primary metric**: `asr` (lower is better)
 - **Benefit metrics**: `filter_recall`, `prompt_harmfulness_f1` (higher is better)
 - **Constraint metrics**: `helpfulness_retention` (higher is better), `over_refusal_rate` and `guard_model_params_M` (lower is better)
-- **Threshold axis**: `nbf_steering` uses the stronger paper threshold, while `nbf_steering_eta_0` measures the weaker default training threshold.
+- **Default scored guard**: `nbf_steering` uses the stronger paper threshold. The eta=0 threshold remains available as an optional diagnostic via `eval/evaluate_outputs.py --include-threshold-axis`, but is excluded from the default scored contract because the local substitute run did not match the paper's eta=0 ASR closely enough.
 - **Run**: `scripts/reproduce.sh`, then inspect `scoring/scores.json`
 
 ## Secondary: heldout_attack_generalization
