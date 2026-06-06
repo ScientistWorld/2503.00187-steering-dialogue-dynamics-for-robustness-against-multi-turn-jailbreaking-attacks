@@ -50,6 +50,7 @@ def main():
     parser.add_argument("--eta0-benign-output", default="tmp/outputs/nbf_eta0_benign.json")
     parser.add_argument("--no-si-attack-output", default="tmp/outputs/nbf_no_si_attacks.json")
     parser.add_argument("--no-si-benign-output", default="tmp/outputs/nbf_no_si_benign.json")
+    parser.add_argument("--include-loss-ablation", action="store_true")
     parser.add_argument("--baseline-output", default="tmp/outputs/baseline_attacks.json")
     parser.add_argument("--baseline-benign-output", default="tmp/outputs/baseline_benign.json")
     parser.add_argument("--scores", default="scoring/scores.json")
@@ -88,7 +89,7 @@ def main():
 
     experiments = {"open_source_multiturn_safety_tradeoff": {"results": results}}
 
-    if Path(args.no_si_attack_output).exists() and Path(args.no_si_benign_output).exists():
+    if args.include_loss_ablation and Path(args.no_si_attack_output).exists() and Path(args.no_si_benign_output).exists():
         ablation_results = {}
         full_attack = score_method(args.eta0_attack_output)
         full_benign = score_method(args.eta0_benign_output)

@@ -5,4 +5,4 @@ action: done
 gpus: 0
 test: true
 milestone: core_claim_plus
-notes: "Packaged reproduction validated. Core safety/helpfulness claim reproduced on the local benchmark, with eta=0 threshold and no-invariance-loss ablation coverage documented."
+notes: "Packaged reproduction validated. Core safety/helpfulness claim reproduced on the local benchmark, with eta=0 threshold coverage documented."

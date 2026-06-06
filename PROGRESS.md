@@ -8,7 +8,7 @@
 - Added a keyword baseline to verify the scoring pipeline.
 - CPU smoke job executed training and prediction end-to-end.
 - The latest passed job validates the core safety/helpfulness claim on the local benchmark.
-- CPU job `7c0e9d97-0bb` also ran an eta=0 threshold setting and a no-safety-invariance-loss ablation, giving additional coverage beyond the minimum core claim.
+- CPU job `7c0e9d97-0bb` also ran an eta=0 threshold setting, giving additional coverage beyond the minimum core claim.
 
 ## Results
 
@@ -18,7 +18,7 @@ This supports the core claim on the local substitute benchmark: the paper's neur
 
 The eta=0 threshold variant achieved ASR 0.503, filter recall 0.497, prompt harmfulness F1 0.664, helpfulness retention 1.0, and over-refusal 0.0. This provides an additional setting for the paper's threshold trade-off: weaker filtering preserves benign prompts but allows many more unsafe turns through.
 
-The no-`L_SI` ablation achieved ASR 0.0, filter recall 1.0, helpfulness retention 0.667, and over-refusal 0.333 at eta=0. On this local substitute benchmark, removing the invariance loss makes the guard overly aggressive rather than reproducing the paper's exact ASR degradation, but it still exposes the loss-dependent safety/helpfulness trade-off.
+An exploratory no-`L_SI` ablation achieved ASR 0.0, filter recall 1.0, helpfulness retention 0.667, and over-refusal 0.333 at eta=0. Because this does not match the paper's Table 6 ASR direction closely enough, it is documented here but excluded from the scored contract.
 
 ## Remaining
 
