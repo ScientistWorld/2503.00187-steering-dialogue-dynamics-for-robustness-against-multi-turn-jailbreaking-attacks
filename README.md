@@ -102,12 +102,27 @@ Run `scripts/reproduce.sh` to train the submitted guardrail, generate attack and
 
 </details>
 
+### Iteration 2: gpt-5.5
+- **Milestone**: `core_claim_plus` | **Status**: done
+- **Working time**: 4m | **GPU**: 0.0h
+- **Jobs**: 4 total (3 completed, 1 failed)
+
+<details>
+<summary>Progress Log</summary>
+
+### [2026-06-06 06:13] - core_claim_plus
+- CPU job `7c0e9d97-0bb` completed successfully in the packaged container.
+- Re-ran the NBF method, keyword guard baseline, eta=0 threshold variant, and no-safety-invariance-loss ablation.
+- `python validate.py --compare` passed with two scored experiments: the core safety/helpfulness trade-off and a Table 6-style loss ablation.
+
+</details>
+
 
 ---
 
 # Reproduction Milestones
 
-**Current: core_claim**
+**Current: core_claim_plus**
 
 ## Stop Justification
-- Completed at milestone `core_claim`.
+- Completed at milestone `core_claim_plus`.
