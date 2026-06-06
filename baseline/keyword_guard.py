@@ -4,9 +4,9 @@ from pathlib import Path
 
 
 KEYWORDS = {
-    "step-by-step", "operational", "unauthorized", "credential", "explosive",
-    "toxic", "evading", "fraud", "weaponization", "self-harm", "harassment",
-    "malware", "actionable",
+    "step-by-step", "unauthorized", "credential theft", "explosive device",
+    "toxic substance", "identity fraud", "weaponization", "malware deployment",
+    "carry it out", "execution playbook",
 }
 
 

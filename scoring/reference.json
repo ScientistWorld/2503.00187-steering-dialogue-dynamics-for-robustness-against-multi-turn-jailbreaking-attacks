@@ -30,6 +30,23 @@
           "over_refusal_rate": 0.096,
           "guard_model_params_M": 115.0
         },
+        "nbf_steering": {
+          "type": "proposed",
+          "asr": 0.1233,
+          "filter_recall": 0.8767,
+          "prompt_harmfulness_f1": 0.811,
+          "helpfulness_retention": 0.9322,
+          "over_refusal_rate": 0.096,
+          "guard_model_params_M": 115.0
+        },
+        "keyword_guard": {
+          "type": "baseline",
+          "asr": 0.3033,
+          "filter_recall": 0.6967,
+          "helpfulness_retention": 1.0214,
+          "over_refusal_rate": 0.178,
+          "guard_model_params_M": 0.0
+        },
         "phi4_original": {
           "type": "baseline",
           "asr": 0.3717,
