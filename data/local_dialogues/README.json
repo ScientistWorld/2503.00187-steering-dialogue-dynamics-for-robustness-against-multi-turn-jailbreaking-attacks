@@ -5,5 +5,21 @@
   "test_dialogues": 240,
   "benign_dialogues": 180,
   "max_turns": 8,
-  "seed": 7
+  "seed": 7,
+  "train_attacks": [
+    "actor",
+    "crescendo",
+    "opposite",
+    "acronym"
+  ],
+  "test_attacks": [
+    "actor",
+    "crescendo",
+    "opposite"
+  ],
+  "benign_attacks": [
+    "actor",
+    "crescendo",
+    "opposite"
+  ]
 }

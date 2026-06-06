@@ -6,14 +6,14 @@
           "asr": 0.0,
           "filter_recall": 1.0,
           "prompt_harmfulness_f1": 1.0,
-          "helpfulness_retention": 0.9583333333333334,
-          "over_refusal_rate": 0.041666666666666664,
+          "helpfulness_retention": 1.0,
+          "over_refusal_rate": 0.0,
           "guard_model_params_M": 23.1
         },
         "nbf_steering_eta_0": {
-          "asr": 0.5033333333333333,
-          "filter_recall": 0.49666666666666665,
-          "prompt_harmfulness_f1": 0.6636971046770601,
+          "asr": 0.6166666666666667,
+          "filter_recall": 0.38333333333333336,
+          "prompt_harmfulness_f1": 0.5542168674698795,
           "helpfulness_retention": 1.0,
           "over_refusal_rate": 0.0,
           "guard_model_params_M": 23.1
@@ -25,6 +25,18 @@
           "helpfulness_retention": 0.825,
           "over_refusal_rate": 0.175,
           "guard_model_params_M": 0.0
+        }
+      }
+    },
+    "heldout_attack_generalization": {
+      "results": {
+        "nbf_heldout_steering": {
+          "asr": 0.0,
+          "filter_recall": 1.0,
+          "prompt_harmfulness_f1": 1.0,
+          "helpfulness_retention": 0.9541666666666667,
+          "over_refusal_rate": 0.04583333333333333,
+          "guard_model_params_M": 23.1
         }
       }
     }
