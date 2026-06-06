@@ -10,6 +10,7 @@
 - The latest passed job validates the core safety/helpfulness claim on the local benchmark.
 - CPU job `7c0e9d97-0bb` also ran an eta=0 threshold setting, giving additional coverage beyond the minimum core claim.
 - Added a Table 5-style held-out attack generalization experiment. It trains the same NBF method without ActorAttack and Opposite-day style trajectories, then evaluates on those held-out families.
+- Continuation audit confirmed the implementation and evaluation separation are intact; `python validate.py --compare` passes on the current scored artifacts.
 
 ## Results
 
@@ -24,6 +25,7 @@ An exploratory no-`L_SI` ablation achieved ASR 0.0, filter recall 1.0, helpfulne
 ## Remaining
 
 - The next submitted job will run the held-out attack generalization experiment. If it improves ASR while retaining benign turns, it will support the paper's secondary generalization claim.
+- The current submission is the held-out attack-family generalization run enabled by `RUN_GENERALIZATION=1`.
 - Higher milestones after that would require broader coverage, such as additional embedding backbones, loss ablations that match the paper's direction, or more closed/open-source LLM table coverage.
 - Exact paper-scale reproduction remains out of scope without the API-generated attack transcripts, paid model access, and larger training budget.
 
