@@ -2,8 +2,8 @@
 # Once you set action to 'done', STOP immediately.
 # Do NOT sleep, poll, or wait. The system reads this file
 # only after your turn ends.
-action: pending
+action: done
 gpus: 0
 test: false
 milestone: secondary_claims
-notes: ""
+notes: "Improvements: added per-family worst-case safety/helpfulness metrics, strengthened guard-size scoring against filename gaming, increased held-out generalization weight, and documented the design handoff. Notes: no score stubs present; bash syntax checks passed; jq was unavailable for JSON parser validation."
