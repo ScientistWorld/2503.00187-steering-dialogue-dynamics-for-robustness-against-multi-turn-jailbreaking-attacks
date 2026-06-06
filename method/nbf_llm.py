@@ -186,6 +186,7 @@ def train(args):
         "nbf_hidden": args.nbf_hidden,
         "embedding_model": args.embedding_model,
         "kappa": args.kappa,
+        "guard_model_params_M": args.guard_model_params_m,
     }, out_dir / "nbf_model.pt")
 
 
@@ -223,7 +224,11 @@ def predict(args):
                 })
             out.append({"id": row["id"], "split": row["split"], "attack": row["attack"], "turns": turns})
     Path(args.output).parent.mkdir(parents=True, exist_ok=True)
-    Path(args.output).write_text(json.dumps({"threshold": args.threshold, "dialogues": out}, indent=2) + "\n", encoding="utf-8")
+    Path(args.output).write_text(json.dumps({
+        "threshold": args.threshold,
+        "guard_model_params_M": ckpt.get("guard_model_params_M"),
+        "dialogues": out,
+    }, indent=2) + "\n", encoding="utf-8")
 
 
 if __name__ == "__main__":
@@ -245,6 +250,7 @@ if __name__ == "__main__":
     p_train.add_argument("--invariance-weight", type=float, default=100.0)
     p_train.add_argument("--train-eta", type=float, default=0.0)
     p_train.add_argument("--kappa", type=int, default=3)
+    p_train.add_argument("--guard-model-params-m", type=float, default=23.1)
     p_train.add_argument("--seed", type=int, default=13)
     p_pred = sub.add_parser("predict")
     p_pred.add_argument("--model-path", default="checkpoints/nbf/nbf_model.pt")

@@ -23,3 +23,8 @@
 - Fixed validation failure by removing the inconsistent eta=0 threshold diagnostic from the default scored contract.
 - The eta=0 output remains available through `eval/evaluate_outputs.py --include-threshold-axis`, but default `scores.json` now includes only reproduced results that pass paper-consistency checks.
 - Re-ran `scripts/evaluate.sh` and `python validate.py --compare`; validation passes.
+
+### [2026-06-06 07:10] - secondary_claims
+- Tightened the scored contract so default `scores.json` now includes per-attack worst-case metrics and zero-buffer barrier diagnostics declared in `reference.json`.
+- Moved guard size reporting into saved method outputs instead of assigning NBF size inside the evaluator, making the size constraint reusable for future methods.
+- Re-ran `scripts/evaluate.sh`, `python validate.py --compare`, and Python compilation checks; validation passes.

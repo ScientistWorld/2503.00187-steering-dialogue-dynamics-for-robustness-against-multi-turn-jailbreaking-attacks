@@ -11,10 +11,12 @@
 - CPU job `7c0e9d97-0bb` also ran an eta=0 threshold setting, giving additional coverage beyond the minimum core claim.
 - Added and ran a Table 5-style held-out attack generalization experiment. It trains the same NBF method without ActorAttack and Opposite-day style trajectories, then evaluates on those held-out families.
 - Continuation audit confirmed the implementation and evaluation separation are intact; `python validate.py --compare` passes on the current scored artifacts.
+- The evaluator now reports all default contract metrics declared in `reference.json`, including worst per-attack-family safety/helpfulness metrics and zero-buffer barrier diagnostics.
+- Guard model size is read from saved output metadata, so future methods can be scored under the same size constraint without editing `eval/`.
 
 ## Results
 
-Latest passed job `a255db70-c05` wrote `scoring/scores.json`: NBF steering achieved ASR 0.0, filter recall 1.0, prompt harmfulness F1 1.0, helpfulness retention 1.0, and over-refusal 0.0 on the main local benchmark. The keyword baseline achieved ASR 0.433, filter recall 0.567, prompt harmfulness F1 0.683, helpfulness retention 0.825, and over-refusal 0.175.
+Latest passed job `a255db70-c05` wrote the scored artifacts that were re-evaluated after the scoring-contract fix. NBF steering achieved ASR 0.0, max attack ASR 0.0, filter recall 1.0, prompt harmfulness F1 1.0, helpfulness retention 1.0, over-refusal 0.0, and guard size 23.1M on the main local benchmark. The keyword baseline achieved ASR 0.433, max attack ASR 0.512, filter recall 0.567, prompt harmfulness F1 0.683, helpfulness retention 0.825, and over-refusal 0.175.
 
 This supports the core claim on the local substitute benchmark: the paper's neural barrier filtering blocks substantially more multi-turn unsafe turns while preserving more benign interactions than the lightweight lexical guard.
 

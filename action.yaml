@@ -5,4 +5,4 @@ action: done
 gpus: 0
 test: false
 milestone: secondary_claims
-notes: "Packaging audit passed: download.sh fetches the required MiniLM embedding model from Hugging Face, paths line up, and no committed shared/ references remain."
+notes: "Secondary claims reproduced on the local NBF benchmark. Scoring now emits all declared default metrics, guard size is read from output metadata, and python validate.py --compare passes."

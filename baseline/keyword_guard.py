@@ -33,7 +33,11 @@ def main():
                 })
             rows.append({"id": row["id"], "split": row["split"], "attack": row["attack"], "turns": turns})
     Path(args.output).parent.mkdir(parents=True, exist_ok=True)
-    Path(args.output).write_text(json.dumps({"threshold": 0.0, "dialogues": rows}, indent=2) + "\n", encoding="utf-8")
+    Path(args.output).write_text(json.dumps({
+        "threshold": 0.0,
+        "guard_model_params_M": 0.0,
+        "dialogues": rows,
+    }, indent=2) + "\n", encoding="utf-8")
 
 
 if __name__ == "__main__":
