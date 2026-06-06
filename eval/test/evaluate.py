@@ -15,7 +15,7 @@ from pathlib import Path
 
 SLICE = "test"
 SPLIT_RULE = "Within each (source_split, attack) dialogue group, sort ids and keep odd-indexed dialogues."
-UNSCORED_DIAGNOSTIC_STEMS = {"nbf_no_si"}
+UNSCORED_DIAGNOSTIC_STEMS = {"nbf_eta0", "nbf_no_si"}
 
 
 def load_json(path: Path) -> dict:
@@ -203,9 +203,8 @@ def build_scores(output_dir: Path, method_set_from: Path) -> dict:
         if wanted is not None and key not in wanted:
             continue
         seen.add(key)
-        attack_threshold_override = 0.0 if exp_name == "heldout_attack_generalization" else None
         experiments[exp_name]["results"][method] = result_metrics(
-            pair["attack_path"], pair["benign_path"], pair["params_m"], attack_threshold_override
+            pair["attack_path"], pair["benign_path"], pair["params_m"]
         )
         artifacts[f"{exp_name}.{method}"] = {
             "stem": pair["stem"],

@@ -5,4 +5,4 @@ action: done
 gpus: 0
 test: false
 milestone: secondary_claims
-notes: "Even/odd train-test split over saved outputs; 13 metrics per result, 52 train metric values and 52 test metric values; main thresholded NBF safety saturates but zero-buffer stress metrics expose gaps (main nbf zero-buffer ASR 0.527 train vs 0.707 test; heldout primary ASR 0.303 vs 0.339)."
+notes: "Even/odd train-test split over saved outputs; 13 metrics per result, 39 train metric values and 39 test metric values; thresholded safety saturates for NBF, but zero-buffer ASR exposes gaps (main nbf 0.527 train vs 0.707 test; heldout 0.303 vs 0.339) while heldout primary uses paper-consistent helpfulness retention."
