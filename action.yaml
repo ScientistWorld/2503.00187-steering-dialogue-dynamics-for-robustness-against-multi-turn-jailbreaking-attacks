@@ -1,8 +1,8 @@
-# This iteration submits the scoring run and stops.
+# This iteration is complete.
 # Do NOT sleep, poll, or wait. The system reads this file
 # only after your turn ends.
-action: submit
+action: done
 gpus: 0
 test: false
 milestone: secondary_claims
-notes: "Re-run split scoring after adding zero-buffer margin stress metrics to reduce thresholded-metric saturation."
+notes: "Even/odd train-test split over saved outputs; 13 metrics per result, 65 train metric values and 65 test metric values; thresholded NBF safety saturates but zero-buffer stress metrics expose train/test gaps (main nbf zero-buffer ASR 0.527 train vs 0.707 test, heldout 0.303 vs 0.339)."
