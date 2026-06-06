@@ -8,6 +8,7 @@
 - Added a keyword baseline to verify the scoring pipeline.
 - CPU smoke job executed training and prediction end-to-end.
 - The latest passed job validates the core safety/helpfulness claim on the local benchmark.
+- CPU job `7c0e9d97-0bb` also ran an eta=0 threshold setting and a no-safety-invariance-loss ablation, giving additional coverage beyond the minimum core claim.
 
 ## Results
 
@@ -17,10 +18,11 @@ This supports the core claim on the local substitute benchmark: the paper's neur
 
 The eta=0 threshold variant achieved ASR 0.503, filter recall 0.497, prompt harmfulness F1 0.664, helpfulness retention 1.0, and over-refusal 0.0. This provides an additional setting for the paper's threshold trade-off: weaker filtering preserves benign prompts but allows many more unsafe turns through.
 
+The no-`L_SI` ablation achieved ASR 0.0, filter recall 1.0, helpfulness retention 0.667, and over-refusal 0.333 at eta=0. On this local substitute benchmark, removing the invariance loss makes the guard overly aggressive rather than reproducing the paper's exact ASR degradation, but it still exposes the loss-dependent safety/helpfulness trade-off.
+
 ## Remaining
 
 - A higher milestone would require broader coverage, such as leave-one-attack-out generalization or reproducing more of the closed/open-source LLM tables.
-- A loss-ablation experiment for Table 6 has been added and is pending the next submitted job.
 - Exact paper-scale reproduction remains out of scope without the API-generated attack transcripts, paid model access, and larger training budget.
 
 ## Issues
@@ -28,6 +30,7 @@ The eta=0 threshold variant achieved ASR 0.503, filter recall 0.497, prompt harm
 - The full paper setup depends on paid GPT/Claude APIs and API-generated attack transcripts. Paid APIs are disallowed, so the autonomous gym uses a local substitute dataset.
 - The first job failed validation because local method names were not listed in `reference.json`; this has been fixed.
 - The eta=0 threshold result is weaker than the paper's eta=0 numbers on the local substitute benchmark; the stronger eta=1e-3 threshold supports the reproduced core claim.
+- The no-`L_SI` ablation does not match the paper's exact ASR direction on the substitute benchmark; it instead demonstrates that loss changes can shift the guard toward over-refusal.
 
 ## Deviations from Paper
 

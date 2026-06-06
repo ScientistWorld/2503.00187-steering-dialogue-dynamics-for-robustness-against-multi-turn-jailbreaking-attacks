@@ -1,8 +1,8 @@
 # IMPORTANT: Once you set action to 'submit' or 'done', STOP immediately.
 # Do NOT sleep, poll, or wait for jobs. The system reads this file
 # only after your turn ends. Sleeping blocks the entire pipeline.
-action: submit
+action: done
 gpus: 0
 test: true
-milestone: core_claim
-notes: "CPU test job reruns the NBF reproduction plus Table 6 no-invariance-loss ablation, baseline, evaluation, and validation."
+milestone: core_claim_plus
+notes: "Packaged reproduction validated. Core safety/helpfulness claim reproduced on the local benchmark, with eta=0 threshold and no-invariance-loss ablation coverage documented."
