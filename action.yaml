@@ -1,3 +1,9 @@
-action: done
+# This iteration writes files only — do NOT submit compute jobs.
+# Once you set action to 'done', STOP immediately.
+# Do NOT sleep, poll, or wait. The system reads this file
+# only after your turn ends.
+action: pending
+gpus: 0
+test: false
 milestone: secondary_claims
-notes: "Reproduced the core NBF safety/helpfulness trade-off plus held-out attack-family generalization on the local benchmark; validation passes."
+notes: ""
