@@ -17,7 +17,7 @@
         "benign_output": "tmp/outputs/nbf_benign.json",
         "fingerprint": "20798aeb9d3e92d0691c7be61c93a53f70ccef9f57fc3b925db278d604b08f29"
       },
-      "open_source_multiturn_safety_tradeoff.nbf_eta0": {
+      "open_source_multiturn_safety_tradeoff.nbf_steering_eta_0": {
         "stem": "nbf_eta0",
         "attack_output": "tmp/outputs/nbf_eta0_attacks.json",
         "benign_output": "tmp/outputs/nbf_eta0_benign.json",
@@ -28,12 +28,6 @@
         "attack_output": "tmp/outputs/nbf_heldout_attacks.json",
         "benign_output": "tmp/outputs/nbf_heldout_benign.json",
         "fingerprint": "08278f42b5c1b3da01a84f218c76596d085ea2b5b5219248ca513e599cd9e8d3"
-      },
-      "open_source_multiturn_safety_tradeoff.nbf_no_si": {
-        "stem": "nbf_no_si",
-        "attack_output": "tmp/outputs/nbf_no_si_attacks.json",
-        "benign_output": "tmp/outputs/nbf_no_si_benign.json",
-        "fingerprint": "d6f19fa00ce8c4ea1992cfae98313b9bd9416d2c6bcfc0918ac27e13578588a1"
       }
     }
   },
@@ -41,11 +35,11 @@
     "heldout_attack_generalization": {
       "results": {
         "nbf_heldout_steering": {
-          "asr": 0.0,
-          "max_attack_asr": 0.0,
-          "filter_recall": 1.0,
-          "min_attack_filter_recall": 1.0,
-          "prompt_harmfulness_f1": 1.0,
+          "asr": 0.3393939393939394,
+          "max_attack_asr": 0.5866666666666667,
+          "filter_recall": 0.6606060606060606,
+          "min_attack_filter_recall": 0.41333333333333333,
+          "prompt_harmfulness_f1": 0.7956204379562044,
           "helpfulness_retention": 0.9333333333333333,
           "min_helpfulness_retention": 0.9166666666666666,
           "over_refusal_rate": 0.06666666666666667,
@@ -89,7 +83,7 @@
           "zero_buffer_over_refusal_rate": 0.0,
           "guard_model_params_M": 23.1
         },
-        "nbf_eta0": {
+        "nbf_steering_eta_0": {
           "asr": 0.7066666666666667,
           "max_attack_asr": 0.98,
           "filter_recall": 0.29333333333333333,
@@ -102,21 +96,6 @@
           "zero_buffer_filter_recall": 0.29333333333333333,
           "zero_buffer_helpfulness_retention": 1.0,
           "zero_buffer_over_refusal_rate": 0.0,
-          "guard_model_params_M": 23.1
-        },
-        "nbf_no_si": {
-          "asr": 0.0,
-          "max_attack_asr": 0.0,
-          "filter_recall": 1.0,
-          "min_attack_filter_recall": 1.0,
-          "prompt_harmfulness_f1": 0.9836065573770492,
-          "helpfulness_retention": 0.6666666666666667,
-          "min_helpfulness_retention": 0.5625,
-          "over_refusal_rate": 0.3333333333333333,
-          "zero_buffer_asr": 0.0,
-          "zero_buffer_filter_recall": 1.0,
-          "zero_buffer_helpfulness_retention": 0.6666666666666667,
-          "zero_buffer_over_refusal_rate": 0.3333333333333333,
           "guard_model_params_M": 23.1
         }
       }
