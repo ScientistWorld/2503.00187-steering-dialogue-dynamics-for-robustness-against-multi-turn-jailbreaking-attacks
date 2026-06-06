@@ -12,7 +12,7 @@ The workspace entered this final check with a prior `secondary_claims` result, b
 ## Fixes Applied
 - Committed removal of the tracked root `trajectory/*.jsonl` artifacts.
 - CPU job `e7898f38-d24` regenerated method outputs, baseline outputs, held-out generalization outputs, train/test scores, and validation artifacts with the corrected filtered-state behavior.
-- Changed the held-out experiment's primary metric to `asr`, which matches the safety-transfer claim and varies across the hidden split.
+- Changed the held-out experiment's primary metric to `filter_recall`, which matches the safety-transfer claim, varies across the hidden split, and avoids an unstable ratio check on a near-zero ASR reference.
 - Verified `python validate.py --compare` passes on the refreshed artifacts.
 - Verified the HuggingFace model endpoint used by `scripts/download.sh` resolves successfully with `curl -I -L --max-time 15`.
 

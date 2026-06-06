@@ -41,7 +41,7 @@ An exploratory no-`L_SI` ablation achieved ASR 0.0, filter recall 1.0, helpfulne
 - The no-`L_SI` ablation does not match the paper's exact ASR direction on the substitute benchmark; it instead demonstrates that loss changes can shift the guard toward over-refusal.
 - The final verifier removed method-specific language from from-scratch-facing scoring guidance.
 - A follow-up audit identified that filtered turns were still advancing the latent state during offline prediction. This has been patched and re-scored.
-- The first corrected rerun failed validation because the held-out experiment's primary metric was `helpfulness_retention`, which was saturated across train/test. The primary metric was changed to held-out `asr`, matching the safety-transfer claim and giving the gym a discriminative target.
+- The first corrected rerun failed validation because the held-out experiment's primary metric was `helpfulness_retention`, which was saturated across train/test. The primary metric was changed to held-out `filter_recall`, matching the safety-transfer claim and giving the gym a discriminative target without turning a near-zero ASR reference into a brittle ratio check.
 
 ## Deviations from Paper
 
