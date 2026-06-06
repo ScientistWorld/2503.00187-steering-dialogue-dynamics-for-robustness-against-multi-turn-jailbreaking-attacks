@@ -15,7 +15,7 @@ from pathlib import Path
 
 SLICE = "test"
 SPLIT_RULE = "Within each (source_split, attack) dialogue group, sort ids and keep odd-indexed dialogues."
-UNSCORED_DIAGNOSTIC_STEMS = {"nbf_eta0", "nbf_no_si"}
+UNSCORED_DIAGNOSTIC_STEMS = {"nbf_eta0", "nbf_no_si", "nbf_heldout"}
 
 
 def load_json(path: Path) -> dict:
