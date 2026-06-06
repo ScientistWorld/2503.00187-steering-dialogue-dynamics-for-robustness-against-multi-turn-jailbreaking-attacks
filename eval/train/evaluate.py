@@ -153,7 +153,9 @@ def guard_params_for(stem: str, attack_path: Path, benign_path: Path) -> float:
     declared = declared_guard_params(attack_path, benign_path)
     if declared is not None:
         return declared
-    return 0.0 if stem == "baseline" else 23.1
+    if stem == "baseline":
+        return 0.0
+    raise SystemExit(f"{attack_path} or {benign_path} must declare guard_model_params_M")
 
 
 def discover_output_pairs(output_dir: Path) -> list[dict]:

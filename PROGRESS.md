@@ -13,6 +13,7 @@
 - Continuation audit confirmed the implementation and evaluation separation are intact; `python validate.py --compare` passes on the current scored artifacts.
 - The evaluator now reports all default contract metrics declared in `reference.json`, including worst per-attack-family safety/helpfulness metrics and zero-buffer barrier diagnostics.
 - Guard model size is read from saved output metadata, so future methods can be scored under the same size constraint without editing `eval/`.
+- Final verification passed after tightening method-agnostic scoring documentation, requiring guard-size metadata in train/test scorers, and confirming the download URL and validation suite.
 
 ## Results
 
@@ -37,6 +38,7 @@ An exploratory no-`L_SI` ablation achieved ASR 0.0, filter recall 1.0, helpfulne
 - The first job failed validation because local method names were not listed in `reference.json`; this has been fixed.
 - The eta=0 threshold result is weaker than the paper's eta=0 numbers on the local substitute benchmark and is not included in default `scores.json`; the stronger eta=1e-3 threshold supports the reproduced core claim.
 - The no-`L_SI` ablation does not match the paper's exact ASR direction on the substitute benchmark; it instead demonstrates that loss changes can shift the guard toward over-refusal.
+- The final verifier removed method-specific language from from-scratch-facing scoring guidance and kept the held-out primary metadata on a paper-reported metric while retaining ASR and zero-buffer ASR as weighted safety objectives.
 
 ## Deviations from Paper
 

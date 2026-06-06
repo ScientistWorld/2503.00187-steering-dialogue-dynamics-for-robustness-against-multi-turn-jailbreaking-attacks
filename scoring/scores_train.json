@@ -8,19 +8,19 @@
         "stem": "baseline",
         "attack_output": "tmp/outputs/baseline_attacks.json",
         "benign_output": "tmp/outputs/baseline_benign.json",
-        "fingerprint": "024737e41fd1f10045782caf7de5b7193b3864395a57c7f40ed3f5fc0ce2466b"
+        "fingerprint": "6f403d409492b39679302e0166c5f8b11abdba7892085e185f87bdd0759bb3a8"
       },
       "open_source_multiturn_safety_tradeoff.nbf_steering": {
         "stem": "nbf",
         "attack_output": "tmp/outputs/nbf_attacks.json",
         "benign_output": "tmp/outputs/nbf_benign.json",
-        "fingerprint": "20798aeb9d3e92d0691c7be61c93a53f70ccef9f57fc3b925db278d604b08f29"
+        "fingerprint": "24bbf54764c7db93a8fd0e4aa4034e6d3044278ba1b983acc25427fda0510aec"
       },
       "heldout_attack_generalization.nbf_heldout_steering": {
         "stem": "nbf_heldout",
         "attack_output": "tmp/outputs/nbf_heldout_attacks.json",
         "benign_output": "tmp/outputs/nbf_heldout_benign.json",
-        "fingerprint": "08278f42b5c1b3da01a84f218c76596d085ea2b5b5219248ca513e599cd9e8d3"
+        "fingerprint": "eb35e8e1f1848158d0eff6bd1c8d32d5ca9ad32daec1826bcd002b1e8cd6cd98"
       }
     }
   },

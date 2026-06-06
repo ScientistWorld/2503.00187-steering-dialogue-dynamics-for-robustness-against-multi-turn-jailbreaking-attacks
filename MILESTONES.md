@@ -28,3 +28,8 @@
 - Tightened the scored contract so default `scores.json` now includes per-attack worst-case metrics and zero-buffer barrier diagnostics declared in `reference.json`.
 - Moved guard size reporting into saved method outputs instead of assigning NBF size inside the evaluator, making the size constraint reusable for future methods.
 - Re-ran `scripts/evaluate.sh`, `python validate.py --compare`, and Python compilation checks; validation passes.
+
+### [2026-06-06 07:18] - secondary_claims
+- Final verification removed method-specific leakage from scoring guidance and required non-baseline methods to declare guard size in saved outputs.
+- Re-ran `scripts/evaluate.sh`, `scripts/evaluate_train.sh`, `scripts/evaluate_test.sh`, `python validate.py --compare`, URL access checks, and Python compilation checks; validation passes.
+- The workspace is ready for gym use with the documented limitation that experiments use a compact local substitute benchmark.

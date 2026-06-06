@@ -5,4 +5,4 @@ action: done
 gpus: 0
 test: false
 milestone: secondary_claims
-notes: "Secondary claims reproduced on the local NBF benchmark. Scoring now emits all declared default metrics, guard size is read from output metadata, and python validate.py --compare passes."
+notes: "Final verification passed at secondary_claims; docs, scoring, reusable evaluators, and validation checks are ready for gym use."
