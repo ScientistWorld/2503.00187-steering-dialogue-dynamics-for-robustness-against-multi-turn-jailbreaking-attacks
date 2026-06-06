@@ -48,7 +48,10 @@ def main():
     parser.add_argument("--benign-output", default="tmp/outputs/nbf_benign.json")
     parser.add_argument("--eta0-attack-output", default="tmp/outputs/nbf_eta0_attacks.json")
     parser.add_argument("--eta0-benign-output", default="tmp/outputs/nbf_eta0_benign.json")
+    parser.add_argument("--no-si-attack-output", default="tmp/outputs/nbf_no_si_attacks.json")
+    parser.add_argument("--no-si-benign-output", default="tmp/outputs/nbf_no_si_benign.json")
     parser.add_argument("--baseline-output", default="tmp/outputs/baseline_attacks.json")
+    parser.add_argument("--baseline-benign-output", default="tmp/outputs/baseline_benign.json")
     parser.add_argument("--scores", default="scoring/scores.json")
     args = parser.parse_args()
 
@@ -73,7 +76,7 @@ def main():
         add_nbf_result("nbf_steering_eta_0", args.eta0_attack_output, args.eta0_benign_output)
 
     if baseline_attack:
-        base_benign = score_method("tmp/outputs/baseline_benign.json")
+        base_benign = score_method(args.baseline_benign_output)
         results["keyword_guard"] = {
             "asr": baseline_attack["overall"]["asr"],
             "filter_recall": baseline_attack["overall"]["filter_recall"],
@@ -83,7 +86,31 @@ def main():
             "guard_model_params_M": 0.0,
         }
 
-    scores = {"experiments": {"open_source_multiturn_safety_tradeoff": {"results": results}}}
+    experiments = {"open_source_multiturn_safety_tradeoff": {"results": results}}
+
+    if Path(args.no_si_attack_output).exists() and Path(args.no_si_benign_output).exists():
+        ablation_results = {}
+        full_attack = score_method(args.eta0_attack_output)
+        full_benign = score_method(args.eta0_benign_output)
+        no_si_attack = score_method(args.no_si_attack_output)
+        no_si_benign = score_method(args.no_si_benign_output)
+        ablation_results["nbf_full_eta_0"] = {
+            "asr": full_attack["overall"]["asr"],
+            "filter_recall": full_attack["overall"]["filter_recall"],
+            "helpfulness_retention": full_benign["overall"]["helpfulness_retention"],
+            "over_refusal_rate": full_benign["overall"]["over_refusal_rate"],
+            "guard_model_params_M": 23.1,
+        }
+        ablation_results["nbf_no_invariance_loss_eta_0"] = {
+            "asr": no_si_attack["overall"]["asr"],
+            "filter_recall": no_si_attack["overall"]["filter_recall"],
+            "helpfulness_retention": no_si_benign["overall"]["helpfulness_retention"],
+            "over_refusal_rate": no_si_benign["overall"]["over_refusal_rate"],
+            "guard_model_params_M": 23.1,
+        }
+        experiments["loss_ablation_eta_0"] = {"results": ablation_results}
+
+    scores = {"experiments": experiments}
     Path(args.scores).write_text(json.dumps(scores, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(scores, indent=2))
 

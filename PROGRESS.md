@@ -19,7 +19,8 @@ The eta=0 threshold variant achieved ASR 0.503, filter recall 0.497, prompt harm
 
 ## Remaining
 
-- A higher milestone would require broader coverage, such as leave-one-attack-out generalization, loss ablations, or reproducing more of the closed/open-source LLM tables.
+- A higher milestone would require broader coverage, such as leave-one-attack-out generalization or reproducing more of the closed/open-source LLM tables.
+- A loss-ablation experiment for Table 6 has been added and is pending the next submitted job.
 - Exact paper-scale reproduction remains out of scope without the API-generated attack transcripts, paid model access, and larger training budget.
 
 ## Issues

@@ -14,3 +14,4 @@ The evaluator must consume saved outputs from `tmp/outputs/` and must not import
 - [ ] Does not train or tune on `test_attacks.jsonl` or `benign.jsonl`
 - [ ] Reports `asr`, helpfulness/over-refusal constraints, and guard size
 - [ ] `scripts/evaluate.sh` works without importing `method/`
+- [ ] Loss ablations change only the targeted loss weight, not data, threshold, or model size
