@@ -1,4 +1,12 @@
 #!/bin/bash
+set -euo pipefail
+
+cd /home/user
+python eval/evaluate_outputs.py \
+  --attack-output tmp/outputs/nbf_attacks.json \
+  --benign-output tmp/outputs/nbf_benign.json \
+  --baseline-output tmp/outputs/baseline_attacks.json \
+  --scores scoring/scores.json
 # Evaluation script — the standard way to evaluate work in this environment.
 #
 # This script must be SELF-CONTAINED using only code in eval/.

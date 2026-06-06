@@ -15,7 +15,10 @@
 
 ## Progress Log
 
-<!-- Write your progress here -->
+### [2026-06-06 05:35] - none
+- Read the paper and extracted the core method and evaluation requirements.
+- Cloned the author repository and confirmed the released code implements the neural state-space model plus neural barrier predictor.
+- Implemented the reproduction environment and prepared the first end-to-end compute job.
 
 ## Stop Justification
-- Completed at milestone `none`.
+- Not stopped.

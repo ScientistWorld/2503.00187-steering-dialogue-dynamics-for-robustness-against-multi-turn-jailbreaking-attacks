@@ -1,4 +1,11 @@
 #!/bin/bash
+set -euo pipefail
+
+cd /home/user
+
+[ -e data/local_dialogues/test_attacks.jsonl ] || python data/generate_dialogues.py --out-dir data/local_dialogues
+python baseline/keyword_guard.py --input-data data/local_dialogues/test_attacks.jsonl --output tmp/outputs/baseline_attacks.json
+python baseline/keyword_guard.py --input-data data/local_dialogues/benign.jsonl --output tmp/outputs/baseline_benign.json
 # Run a baseline method from the paper.
 #
 # Baselines are simple reference methods the paper compares against. 

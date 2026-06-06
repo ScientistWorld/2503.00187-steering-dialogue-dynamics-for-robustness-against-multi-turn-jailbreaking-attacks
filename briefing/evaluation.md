@@ -1,15 +1,18 @@
 # Evaluation
 
-How success is measured. Describe only the metrics, targets, and evaluation procedure — do NOT describe the paper's method or how they achieved these results. Think of this as a general evaluation protocal for other scientists trying to solve the same problem, where they should not see this paper's solution.
-
 ## Metrics
 
-<!-- What metrics are used? How are they computed? What does higher/lower mean? -->
+- **Attack success rate (ASR)**: fraction of unsafe turns that pass the guardrail. Lower is better.
+- **Filter recall**: fraction of unsafe turns blocked. Higher is better.
+- **Prompt harmfulness F1**: F1 for identifying unsafe prompts. Higher is better.
+- **Helpfulness retention**: fraction of benign turns not filtered. Higher is better.
+- **Over-refusal rate**: fraction of benign turns filtered. Lower is better.
+- **Guard model parameters**: size of the guard model in millions of parameters. Lower is better when safety is comparable.
 
 ## Baselines and Targets
 
-<!-- What performance levels exist as reference points? Include the paper's reported numbers as targets, and any standard baselines. A scientist agent should know what "good" looks like. -->
+The paper reports large reductions in average ASR on open-source Llama-3-8B and Phi-4 models under ActorAttack, Crescendo, and Opposite-day while retaining most MTBench helpfulness and keeping XSTest over-refusal low. The local reproduction uses the same metric types on a compact multi-turn safety benchmark.
 
 ## Evaluation Protocol
 
-<!-- How should evaluation be run? What data split, what conditions? Any important details about how to compare fairly (e.g., fixed seeds, specific test sets, averaging over runs). -->
+Run `scripts/reproduce.sh` to train the submitted guardrail, generate attack and benign filtering decisions, run the keyword baseline, and call `scripts/evaluate.sh`. The evaluator reads only saved outputs in `tmp/outputs/` and writes `scoring/scores.json`; it does not import from `method/`.

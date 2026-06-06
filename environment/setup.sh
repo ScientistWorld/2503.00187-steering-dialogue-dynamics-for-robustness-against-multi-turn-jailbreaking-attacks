@@ -16,4 +16,9 @@
 
 set -e
 
-# uv pip install --system <packages>
+uv pip install --system \
+  torch \
+  sentence-transformers \
+  transformers \
+  scikit-learn \
+  tensorboard

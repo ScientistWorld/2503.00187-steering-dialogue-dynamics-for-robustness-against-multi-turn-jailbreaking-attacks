@@ -1,4 +1,10 @@
 #!/bin/bash
+set -euo pipefail
+
+cd /home/user
+scripts/method.sh
+scripts/baseline.sh
+scripts/evaluate.sh
 # Reproduce the paper's results end-to-end.
 #
 # This script runs inside the compute container and should call
