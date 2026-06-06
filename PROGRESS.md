@@ -6,27 +6,27 @@
 - Implemented a runnable reproduction of the paper's computational method: sentence embeddings, neural dialogue state-space dynamics, safety predictor, safe-set loss, safety-invariance loss, and threshold filtering.
 - Added method-agnostic evaluation that reads saved outputs only.
 - Added a keyword baseline to verify the scoring pipeline.
-- CPU smoke job executed training and prediction end-to-end.
-- The latest passed job validates the core safety/helpfulness claim on the local benchmark.
+- CPU smoke jobs executed training and prediction end-to-end.
+- The latest passed jobs validate the core safety/helpfulness claim and the held-out attack-family generalization claim on the local benchmark.
 - CPU job `7c0e9d97-0bb` also ran an eta=0 threshold setting, giving additional coverage beyond the minimum core claim.
-- Added a Table 5-style held-out attack generalization experiment. It trains the same NBF method without ActorAttack and Opposite-day style trajectories, then evaluates on those held-out families.
+- Added and ran a Table 5-style held-out attack generalization experiment. It trains the same NBF method without ActorAttack and Opposite-day style trajectories, then evaluates on those held-out families.
 - Continuation audit confirmed the implementation and evaluation separation are intact; `python validate.py --compare` passes on the current scored artifacts.
 
 ## Results
 
-Latest passed job wrote `scoring/scores.json`: NBF steering achieved ASR 0.0, filter recall 1.0, prompt harmfulness F1 1.0, helpfulness retention 0.958, and over-refusal 0.042. The keyword baseline achieved ASR 0.433, filter recall 0.567, prompt harmfulness F1 0.683, helpfulness retention 0.825, and over-refusal 0.175.
+Latest passed job `a255db70-c05` wrote `scoring/scores.json`: NBF steering achieved ASR 0.0, filter recall 1.0, prompt harmfulness F1 1.0, helpfulness retention 1.0, and over-refusal 0.0 on the main local benchmark. The keyword baseline achieved ASR 0.433, filter recall 0.567, prompt harmfulness F1 0.683, helpfulness retention 0.825, and over-refusal 0.175.
 
 This supports the core claim on the local substitute benchmark: the paper's neural barrier filtering blocks substantially more multi-turn unsafe turns while preserving more benign interactions than the lightweight lexical guard.
 
-The eta=0 threshold variant achieved ASR 0.503, filter recall 0.497, prompt harmfulness F1 0.664, helpfulness retention 1.0, and over-refusal 0.0. This provides an additional setting for the paper's threshold trade-off: weaker filtering preserves benign prompts but allows many more unsafe turns through.
+The eta=0 threshold variant achieved ASR 0.617, filter recall 0.383, prompt harmfulness F1 0.554, helpfulness retention 1.0, and over-refusal 0.0. This provides an additional setting for the paper's threshold trade-off: weaker filtering preserves benign prompts but allows many more unsafe turns through.
+
+The held-out attack-family run achieved ASR 0.0, filter recall 1.0, prompt harmfulness F1 1.0, helpfulness retention 0.954, and over-refusal 0.046 after training without ActorAttack and Opposite-day families. This supports the paper's secondary generalization claim on the local substitute benchmark.
 
 An exploratory no-`L_SI` ablation achieved ASR 0.0, filter recall 1.0, helpfulness retention 0.667, and over-refusal 0.333 at eta=0. Because this does not match the paper's Table 6 ASR direction closely enough, it is documented here but excluded from the scored contract.
 
 ## Remaining
 
-- The next submitted job will run the held-out attack generalization experiment. If it improves ASR while retaining benign turns, it will support the paper's secondary generalization claim.
-- The current submission is the held-out attack-family generalization run enabled by `RUN_GENERALIZATION=1`.
-- Higher milestones after that would require broader coverage, such as additional embedding backbones, loss ablations that match the paper's direction, or more closed/open-source LLM table coverage.
+- Higher milestones would require broader coverage, such as additional embedding backbones, loss ablations that match the paper's direction, or more closed/open-source LLM table coverage.
 - Exact paper-scale reproduction remains out of scope without the API-generated attack transcripts, paid model access, and larger training budget.
 
 ## Issues
