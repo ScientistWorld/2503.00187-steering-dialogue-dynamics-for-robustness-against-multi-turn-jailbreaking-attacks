@@ -48,6 +48,10 @@
           "helpfulness_retention": 0.975,
           "min_helpfulness_retention": 0.95,
           "over_refusal_rate": 0.025,
+          "zero_buffer_asr": 0.30303030303030304,
+          "zero_buffer_filter_recall": 0.696969696969697,
+          "zero_buffer_helpfulness_retention": 1.0,
+          "zero_buffer_over_refusal_rate": 0.0,
           "guard_model_params_M": 23.1
         }
       }
@@ -63,6 +67,10 @@
           "helpfulness_retention": 0.8333333333333334,
           "min_helpfulness_retention": 0.8,
           "over_refusal_rate": 0.16666666666666666,
+          "zero_buffer_asr": 0.42,
+          "zero_buffer_filter_recall": 0.58,
+          "zero_buffer_helpfulness_retention": 0.8333333333333334,
+          "zero_buffer_over_refusal_rate": 0.16666666666666666,
           "guard_model_params_M": 0.0
         },
         "nbf_steering": {
@@ -74,6 +82,10 @@
           "helpfulness_retention": 1.0,
           "min_helpfulness_retention": 1.0,
           "over_refusal_rate": 0.0,
+          "zero_buffer_asr": 0.5266666666666666,
+          "zero_buffer_filter_recall": 0.47333333333333333,
+          "zero_buffer_helpfulness_retention": 1.0,
+          "zero_buffer_over_refusal_rate": 0.0,
           "guard_model_params_M": 23.1
         },
         "nbf_eta0": {
@@ -85,6 +97,10 @@
           "helpfulness_retention": 1.0,
           "min_helpfulness_retention": 1.0,
           "over_refusal_rate": 0.0,
+          "zero_buffer_asr": 0.5266666666666666,
+          "zero_buffer_filter_recall": 0.47333333333333333,
+          "zero_buffer_helpfulness_retention": 1.0,
+          "zero_buffer_over_refusal_rate": 0.0,
           "guard_model_params_M": 23.1
         },
         "nbf_no_si": {
@@ -96,6 +112,10 @@
           "helpfulness_retention": 0.6666666666666667,
           "min_helpfulness_retention": 0.625,
           "over_refusal_rate": 0.3333333333333333,
+          "zero_buffer_asr": 0.0,
+          "zero_buffer_filter_recall": 1.0,
+          "zero_buffer_helpfulness_retention": 0.6666666666666667,
+          "zero_buffer_over_refusal_rate": 0.3333333333333333,
           "guard_model_params_M": 23.1
         }
       }
