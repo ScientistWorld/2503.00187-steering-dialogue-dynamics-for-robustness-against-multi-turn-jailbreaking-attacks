@@ -1,23 +1,25 @@
 # Verification Report
 
 ## Initial Assessment
-The workspace entered this final check with a prior `secondary_claims` result, but a follow-up patch changed the NBF steering semantics so filtered queries no longer advance the latent dialogue state. The saved `tmp/outputs/*.json` artifacts and `scoring/scores*.json` files still predate that patch, confirmed by the absence of the new `state_advanced` field in saved outputs. Therefore the previous `secondary_claims` result is not yet revalidated for the current code.
+The workspace entered this final check with a prior `secondary_claims` result, but a follow-up patch changed the NBF steering semantics so filtered queries no longer advance the latent dialogue state. A CPU rerun has now regenerated the scored artifacts under the corrected semantics.
 
 ## Issues Found
-- **Critical**: Current scored artifacts are stale relative to the patched method. The corrected method needs a fresh CPU rerun before `secondary_claims` can be restored.
+- **Critical**: The previous scored artifacts were stale relative to the patched method. The rerun fixed this, but the corrected held-out result no longer supports the paper's secondary generalization claim.
+- **Critical**: The held-out experiment used `helpfulness_retention` as its primary metric even though it was saturated across the train/test split. This made the hidden split non-discriminative for the ranked metric.
 - **Minor**: Root-level tracked `trajectory/*.jsonl` artifacts were deleted in the worktree but not committed. These raw trajectory files do not belong in the workspace root.
 - **Minor**: `README.md` and `manifest.json` appear as modified character-device files in the worktree. They are unrelated root/system artifacts, so I did not alter them.
 
 ## Fixes Applied
 - Committed removal of the tracked root `trajectory/*.jsonl` artifacts.
-- Verified `python validate.py --compare` still passes structurally on existing artifacts.
+- CPU job `e7898f38-d24` regenerated method outputs, baseline outputs, held-out generalization outputs, train/test scores, and validation artifacts with the corrected filtered-state behavior.
+- Changed the held-out experiment's primary metric to `asr`, which matches the safety-transfer claim and varies across the hidden split.
+- Verified `python validate.py --compare` passes on the refreshed artifacts.
 - Verified the HuggingFace model endpoint used by `scripts/download.sh` resolves successfully with `curl -I -L --max-time 15`.
-- Left `action.yaml` set to submit a CPU job through `scripts/run.sh`, which regenerates method outputs, baseline outputs, held-out generalization outputs, train/test scores, and validation under the corrected steering semantics.
 
 ## Final Judgment
-The workspace is structurally close to ready, and the method/evaluation separation checks pass, but it is not ready to close until the corrected rerun refreshes `scores.json`, `scores_train.json`, and `scores_test.json`. The milestone should remain conservative for this turn.
+The workspace is ready as a `core_claim` gym. The main safety/helpfulness trade-off is reproduced on the local substitute benchmark, evaluation is reusable, method-agnostic files are clean enough for from-scratch agents, and validation passes. The previous `secondary_claims` milestone is not justified after the corrected rerun because held-out attack generalization is weak.
 
-- Milestone: method_runs
-- Ready for gym use: partial
+- Milestone: core_claim
+- Ready for gym use: yes
 - Confidence: medium
-- Key limitation: corrected steering behavior has not yet been re-scored; benchmark uses local synthetic substitute data rather than the full API-generated benchmark.
+- Key limitation: benchmark uses local synthetic substitute data, and the corrected held-out generalization experiment is a target for future improvement rather than a reproduced secondary claim.

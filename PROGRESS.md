@@ -7,9 +7,9 @@
 - Added method-agnostic evaluation that reads saved outputs only.
 - Added a keyword baseline to verify the scoring pipeline.
 - CPU smoke jobs executed training and prediction end-to-end.
-- The latest passed jobs validate the core safety/helpfulness claim and the held-out attack-family generalization claim on the local benchmark.
+- The latest passed validation confirms the core safety/helpfulness claim on the local benchmark.
 - CPU job `7c0e9d97-0bb` also ran an eta=0 threshold setting, giving additional coverage beyond the minimum core claim.
-- Added and ran a Table 5-style held-out attack generalization experiment. It trains the same NBF method without ActorAttack and Opposite-day style trajectories, then evaluates on those held-out families.
+- Added and ran a Table 5-style held-out attack generalization experiment. It trains the same NBF method without ActorAttack and Opposite-day style trajectories, then evaluates on those held-out families; after the filtered-state fidelity fix this remains a scored target for future improvement but is not a reproduced secondary claim.
 - Continuation audit confirmed the implementation and evaluation separation are intact; `python validate.py --compare` passes on the current scored artifacts.
 - The evaluator now reports all default contract metrics declared in `reference.json`, including worst per-attack-family safety/helpfulness metrics and zero-buffer barrier diagnostics.
 - Guard model size is read from saved output metadata, so future methods can be scored under the same size constraint without editing `eval/`.
@@ -19,13 +19,11 @@
 
 ## Results
 
-Latest passed job `a255db70-c05` wrote the scored artifacts that were re-evaluated after the scoring-contract fix. NBF steering achieved ASR 0.0, max attack ASR 0.0, filter recall 1.0, prompt harmfulness F1 1.0, helpfulness retention 1.0, over-refusal 0.0, and guard size 23.1M on the main local benchmark. The keyword baseline achieved ASR 0.433, max attack ASR 0.512, filter recall 0.567, prompt harmfulness F1 0.683, helpfulness retention 0.825, and over-refusal 0.175.
-
-These numbers were produced before the filtered-state fix and are now treated as stale until the next submitted job regenerates `tmp/outputs` and `scoring/scores.json` under the corrected steering semantics.
+Latest CPU job `e7898f38-d24` regenerated scored artifacts under the corrected filtered-state semantics. On the main local benchmark, NBF steering achieved ASR 0.133, max attack ASR 0.192, filter recall 0.867, prompt harmfulness F1 0.929, helpfulness retention 1.0, over-refusal 0.0, and guard size 23.1M. The keyword baseline achieved ASR 0.433, max attack ASR 0.512, filter recall 0.567, prompt harmfulness F1 0.683, helpfulness retention 0.825, over-refusal 0.175, and guard size 0.0M. This supports the core safety/helpfulness trade-off.
 
 The eta=0 threshold diagnostic achieved ASR 0.617, filter recall 0.383, prompt harmfulness F1 0.554, helpfulness retention 1.0, and over-refusal 0.0. Because this is too far from the paper's eta=0 ASR to pass consistency validation, it is documented as exploratory and excluded from the default scored contract.
 
-The held-out attack-family run achieved ASR 0.0, filter recall 1.0, prompt harmfulness F1 1.0, helpfulness retention 0.954, and over-refusal 0.046 after training without ActorAttack and Opposite-day families. This supports the paper's secondary generalization claim on the local substitute benchmark.
+The held-out attack-family run achieved ASR 0.503, max attack ASR 0.507, filter recall 0.497, prompt harmfulness F1 0.664, helpfulness retention 1.0, and over-refusal 0.0 after training without ActorAttack and Opposite-day families. This result is weaker than the paper's held-out result and does not support the secondary generalization claim; it is kept in `scores.json` as a meaningful improvement target for future agents.
 
 An exploratory no-`L_SI` ablation achieved ASR 0.0, filter recall 1.0, helpfulness retention 0.667, and over-refusal 0.333 at eta=0. Because this does not match the paper's Table 6 ASR direction closely enough, it is documented here but excluded from the scored contract.
 
@@ -33,7 +31,7 @@ An exploratory no-`L_SI` ablation achieved ASR 0.0, filter recall 1.0, helpfulne
 
 - Higher milestones would require broader coverage, such as additional embedding backbones, loss ablations that match the paper's direction, or more closed/open-source LLM table coverage.
 - Exact paper-scale reproduction remains out of scope without the API-generated attack transcripts, paid model access, and larger training budget.
-- The next job must confirm whether the corrected online-steering state update restores the previous `core_claim`/`secondary_claims` results on the local benchmark.
+- Higher milestones require improving or fixing the held-out generalization result under the corrected filtered-state semantics.
 
 ## Issues
 
@@ -41,8 +39,9 @@ An exploratory no-`L_SI` ablation achieved ASR 0.0, filter recall 1.0, helpfulne
 - The first job failed validation because local method names were not listed in `reference.json`; this has been fixed.
 - The eta=0 threshold result is weaker than the paper's eta=0 numbers on the local substitute benchmark and is not included in default `scores.json`; the stronger eta=1e-3 threshold supports the reproduced core claim.
 - The no-`L_SI` ablation does not match the paper's exact ASR direction on the substitute benchmark; it instead demonstrates that loss changes can shift the guard toward over-refusal.
-- The final verifier removed method-specific language from from-scratch-facing scoring guidance and kept the held-out primary metadata on a paper-reported metric while retaining ASR and zero-buffer ASR as weighted safety objectives.
-- A follow-up audit identified that filtered turns were still advancing the latent state during offline prediction. This has been patched, but the current checked-in scores are stale until the submitted rerun finishes.
+- The final verifier removed method-specific language from from-scratch-facing scoring guidance.
+- A follow-up audit identified that filtered turns were still advancing the latent state during offline prediction. This has been patched and re-scored.
+- The first corrected rerun failed validation because the held-out experiment's primary metric was `helpfulness_retention`, which was saturated across train/test. The primary metric was changed to held-out `asr`, matching the safety-transfer claim and giving the gym a discriminative target.
 
 ## Deviations from Paper
 

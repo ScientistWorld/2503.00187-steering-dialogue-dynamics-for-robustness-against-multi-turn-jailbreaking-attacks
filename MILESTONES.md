@@ -1,6 +1,6 @@
 # Reproduction Milestones
 
-**Current: method_runs**
+**Current: core_claim**
 
 ## Progress Log
 
@@ -43,3 +43,8 @@
 - Final verification confirmed the saved outputs are stale relative to the filtered-state patch because they do not contain the new `state_advanced` marker.
 - Committed removal of root-level tracked `trajectory/*.jsonl` artifacts.
 - Keeping the workspace at `method_runs` and submitting a CPU rerun before restoring `secondary_claims`.
+
+### [2026-06-06 07:38] - core_claim
+- CPU job `e7898f38-d24` regenerated outputs with the corrected filtered-state semantics.
+- The main safety/helpfulness trade-off still supports the core claim: NBF steering reduced ASR from 0.433 for the keyword baseline to 0.133 while retaining all benign turns on the local benchmark.
+- The held-out generalization result no longer supports `secondary_claims` after the fidelity fix: held-out ASR is 0.503, so the workspace is closed at `core_claim` rather than restoring the previous milestone.

@@ -1,8 +1,4 @@
-# Submit the corrected steering run.
-# Do NOT sleep, poll, or wait. The system reads this file
-# only after your turn ends.
-action: submit
-gpus: 0
-test: false
-milestone: method_runs
-notes: "Rerun after fixing NBF prediction so filtered queries no longer advance the latent dialogue state; run.sh regenerates method/baseline outputs, held-out generalization, train/test scores, and validate.py --compare."
+# Final verification completed after the corrected CPU rerun.
+action: done
+milestone: core_claim
+notes: "Corrected rerun validates the main safety/helpfulness trade-off; held-out generalization remains scored but does not support secondary_claims."

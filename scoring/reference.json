@@ -136,7 +136,7 @@
     "heldout_attack_generalization": {
       "description": "Generalization to attack families omitted from NBF training, based on Table 5 for Llama-3-8B trained without ActorAttack and Opposite-day.",
       "weight": 0.4,
-      "primary_metric": "helpfulness_retention",
+      "primary_metric": "asr",
       "metrics": {
         "asr": {
           "higher_is_better": false,

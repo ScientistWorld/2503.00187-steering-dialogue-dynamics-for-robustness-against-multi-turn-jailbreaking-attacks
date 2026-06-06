@@ -10,7 +10,7 @@ Tests whether a guardrail blocks unsafe turns in multi-turn conversations while 
 
 ## Secondary: heldout_attack_generalization
 Tests whether a guardrail trained without selected attack families still filters those held-out families.
-- **Primary metric**: `helpfulness_retention` (higher is better; paper-reported and non-saturated across the hidden split)
+- **Primary metric**: `asr` (lower is better)
 - **Benefit metrics**: `asr` and `zero_buffer_asr` (lower is better), `filter_recall`, `zero_buffer_filter_recall`, and `prompt_harmfulness_f1` (higher is better)
 - **Constraint metrics**: `helpfulness_retention` (higher is better), `over_refusal_rate` and `guard_model_params_M` (lower is better)
 - **Robustness diagnostics**: worst-family and zero-buffer metrics use the same definitions as the primary experiment.
