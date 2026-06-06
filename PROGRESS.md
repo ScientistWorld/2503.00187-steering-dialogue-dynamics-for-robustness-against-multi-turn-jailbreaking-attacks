@@ -7,21 +7,24 @@
 - Added method-agnostic evaluation that reads saved outputs only.
 - Added a keyword baseline to verify the scoring pipeline.
 - CPU smoke job executed training and prediction end-to-end.
+- The latest passed job validates the core safety/helpfulness claim on the local benchmark.
 
 ## Results
 
-First smoke job wrote `scoring/scores.json`: NBF steering achieved ASR 0.0, filter recall 1.0, helpfulness retention 0.958, and over-refusal 0.042 on the initial local split. The keyword baseline also had ASR 0.0 but over-refused all benign turns, revealing that the initial split was too keyword-obvious for a useful benchmark.
+Latest passed job wrote `scoring/scores.json`: NBF steering achieved ASR 0.0, filter recall 1.0, prompt harmfulness F1 1.0, helpfulness retention 0.958, and over-refusal 0.042. The keyword baseline achieved ASR 0.433, filter recall 0.567, prompt harmfulness F1 0.683, helpfulness retention 0.825, and over-refusal 0.175.
+
+This supports the core claim on the local substitute benchmark: the paper's neural barrier filtering blocks substantially more multi-turn unsafe turns while preserving more benign interactions than the lightweight lexical guard.
 
 ## Remaining
 
-- Run the revised nontrivial local split.
-- Inspect whether NBF steering beats the keyword baseline on the safety/helpfulness trade-off.
-- If results are weak, tune threshold/epochs and resubmit.
+- Run the cleaned scripts once more after adding the eta=0 threshold variant.
+- A higher milestone would require broader coverage, such as leave-one-attack-out generalization or loss ablations.
 
 ## Issues
 
 - The full paper setup depends on paid GPT/Claude APIs and API-generated attack transcripts. Paid APIs are disallowed, so the autonomous gym uses a local substitute dataset.
 - The first job failed validation because local method names were not listed in `reference.json`; this has been fixed.
+- The eta=0 threshold variant has been added to the evaluator and will be populated by the next verification job.
 
 ## Deviations from Paper
 

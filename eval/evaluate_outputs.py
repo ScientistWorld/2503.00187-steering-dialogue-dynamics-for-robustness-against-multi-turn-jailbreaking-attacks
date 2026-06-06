@@ -46,24 +46,32 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--attack-output", default="tmp/outputs/nbf_attacks.json")
     parser.add_argument("--benign-output", default="tmp/outputs/nbf_benign.json")
+    parser.add_argument("--eta0-attack-output", default="tmp/outputs/nbf_eta0_attacks.json")
+    parser.add_argument("--eta0-benign-output", default="tmp/outputs/nbf_eta0_benign.json")
     parser.add_argument("--baseline-output", default="tmp/outputs/baseline_attacks.json")
     parser.add_argument("--scores", default="scoring/scores.json")
     args = parser.parse_args()
 
-    nbf_attack = score_method(args.attack_output)
-    nbf_benign = score_method(args.benign_output)
     baseline_attack = score_method(args.baseline_output) if Path(args.baseline_output).exists() else None
 
-    results = {
-        "nbf_steering": {
-            "asr": nbf_attack["overall"]["asr"],
-            "filter_recall": nbf_attack["overall"]["filter_recall"],
-            "prompt_harmfulness_f1": nbf_attack["overall"]["prompt_harmfulness_f1"],
-            "helpfulness_retention": nbf_benign["overall"]["helpfulness_retention"],
-            "over_refusal_rate": nbf_benign["overall"]["over_refusal_rate"],
+    results = {}
+
+    def add_nbf_result(name, attack_path, benign_path):
+        attack = score_method(attack_path)
+        benign = score_method(benign_path)
+        results[name] = {
+            "asr": attack["overall"]["asr"],
+            "filter_recall": attack["overall"]["filter_recall"],
+            "prompt_harmfulness_f1": attack["overall"]["prompt_harmfulness_f1"],
+            "helpfulness_retention": benign["overall"]["helpfulness_retention"],
+            "over_refusal_rate": benign["overall"]["over_refusal_rate"],
             "guard_model_params_M": 23.1,
         }
-    }
+
+    add_nbf_result("nbf_steering", args.attack_output, args.benign_output)
+    if Path(args.eta0_attack_output).exists() and Path(args.eta0_benign_output).exists():
+        add_nbf_result("nbf_steering_eta_0", args.eta0_attack_output, args.eta0_benign_output)
+
     if baseline_attack:
         base_benign = score_method("tmp/outputs/baseline_benign.json")
         results["keyword_guard"] = {

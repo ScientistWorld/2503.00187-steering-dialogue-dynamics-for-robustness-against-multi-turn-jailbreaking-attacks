@@ -30,5 +30,5 @@
 action: submit
 gpus: 0
 test: true
-milestone: method_runs
-notes: "CPU smoke job after fixing reference method names and making the local benchmark less keyword-obvious; reruns NBF training, baseline, evaluator, and validation."
+milestone: core_claim
+notes: "Final CPU verification after cleaning wrapper scripts and adding the eta=0 threshold variant; regenerates scores and runs validation."
