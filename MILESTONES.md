@@ -38,3 +38,8 @@
 - Follow-up audit found the offline steering predictor was still advancing the latent dialogue state through queries it had marked as filtered.
 - Patched `method/nbf_llm.py` so filtered turns leave the state unchanged, matching the author attack-loop behavior where filtered prompts are skipped before entering dialogue history.
 - Updated `scripts/run.sh` to regenerate method and baseline outputs from scratch before evaluation, and submitting a CPU job to refresh scores under the corrected steering semantics.
+
+### [2026-06-06 07:40] - method_runs
+- Final verification confirmed the saved outputs are stale relative to the filtered-state patch because they do not contain the new `state_advanced` marker.
+- Committed removal of root-level tracked `trajectory/*.jsonl` artifacts.
+- Keeping the workspace at `method_runs` and submitting a CPU rerun before restoring `secondary_claims`.

@@ -1,25 +1,23 @@
 # Verification Report
 
 ## Initial Assessment
-The workspace started at `secondary_claims`. The claimed milestone was broadly justified: the method code implements the paper's dialogue-dynamics guardrail computation, saved artifacts exist for the main trade-off and held-out attack-family experiments, and the evaluator reads saved method outputs rather than importing or rerunning `method/`.
+The workspace entered this final check with a prior `secondary_claims` result, but a follow-up patch changed the NBF steering semantics so filtered queries no longer advance the latent dialogue state. The saved `tmp/outputs/*.json` artifacts and `scoring/scores*.json` files still predate that patch, confirmed by the absence of the new `state_advanced` field in saved outputs. Therefore the previous `secondary_claims` result is not yet revalidated for the current code.
 
 ## Issues Found
-- **Minor**: `scoring/EXPERIMENTS.md` and `scoring/TARGETS.md` contained method-specific threshold wording that was inappropriate for method-agnostic or method-safe guidance.
-- **Minor**: train/test evaluators still had a hardcoded non-baseline guard-size fallback, which could hide missing `guard_model_params_M` metadata from future methods.
-- **Minor**: the held-out experiment's primary metric metadata needed to stay on a paper-reported, non-saturated metric while retaining ASR and zero-buffer safety diagnostics as weighted objectives.
-- **Minor**: tracked raw `trajectory/` files were already deleted in the worktree and should not remain as root-level artifacts.
+- **Critical**: Current scored artifacts are stale relative to the patched method. The corrected method needs a fresh CPU rerun before `secondary_claims` can be restored.
+- **Minor**: Root-level tracked `trajectory/*.jsonl` artifacts were deleted in the worktree but not committed. These raw trajectory files do not belong in the workspace root.
+- **Minor**: `README.md` and `manifest.json` appear as modified character-device files in the worktree. They are unrelated root/system artifacts, so I did not alter them.
 
 ## Fixes Applied
-- Removed method-specific threshold language from the method-agnostic experiment documentation and tightened the target wording.
-- Changed train/test scorers to require `guard_model_params_M` in saved outputs for non-baseline methods.
-- Kept `heldout_attack_generalization.primary_metric` on `helpfulness_retention` so `reference.json` remains tied to paper-reported values; ASR and zero-buffer ASR remain weighted safety metrics.
-- Verified the model download URL with `curl -I -L --max-time 15`.
-- Re-ran `scripts/evaluate.sh`, `scripts/evaluate_train.sh`, `scripts/evaluate_test.sh`, `python validate.py --compare`, and Python compilation checks. All validation checks pass. The only warning is a harmless syntax warning in the cloned author repository.
+- Committed removal of the tracked root `trajectory/*.jsonl` artifacts.
+- Verified `python validate.py --compare` still passes structurally on existing artifacts.
+- Verified the HuggingFace model endpoint used by `scripts/download.sh` resolves successfully with `curl -I -L --max-time 15`.
+- Left `action.yaml` set to submit a CPU job through `scripts/run.sh`, which regenerates method outputs, baseline outputs, held-out generalization outputs, train/test scores, and validation under the corrected steering semantics.
 
 ## Final Judgment
-The workspace is ready to serve as a research gym. Improve-mode agents can build on the reproduced method and compare against `scores.json`; from-scratch agents can use the method-agnostic problem, data, and evaluator without importing the paper method. The main limitation is that the benchmark uses a compact local substitute dataset because the paper depends on paid API-generated transcripts and paid model judging.
+The workspace is structurally close to ready, and the method/evaluation separation checks pass, but it is not ready to close until the corrected rerun refreshes `scores.json`, `scores_train.json`, and `scores_test.json`. The milestone should remain conservative for this turn.
 
-- Milestone: secondary_claims
-- Ready for gym use: yes
+- Milestone: method_runs
+- Ready for gym use: partial
 - Confidence: medium
-- Key limitation: local synthetic substitute data rather than the full API-generated benchmark
+- Key limitation: corrected steering behavior has not yet been re-scored; benchmark uses local synthetic substitute data rather than the full API-generated benchmark.
