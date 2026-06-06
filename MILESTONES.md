@@ -36,4 +36,4 @@
 - The stronger eta=1e-3 setting remains the reproduced core result.
 
 ## Stop Justification
-- Reproduction packaged and validated at `core_claim_plus`; broader paper coverage would require paid/API-generated datasets or substantially larger experimental matrices.
+- Completed at milestone `core_claim_plus`.
