@@ -1,8 +1,8 @@
-# This iteration is complete.
+# Submit the corrected steering run.
 # Do NOT sleep, poll, or wait. The system reads this file
 # only after your turn ends.
-action: done
+action: submit
 gpus: 0
 test: false
-milestone: secondary_claims
-notes: "Final verification passed at secondary_claims; docs, scoring, reusable evaluators, and validation checks are ready for gym use."
+milestone: method_runs
+notes: "Rerun after fixing NBF prediction so filtered queries no longer advance the latent dialogue state; run.sh regenerates method/baseline outputs, held-out generalization, train/test scores, and validate.py --compare."
