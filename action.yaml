@@ -1,5 +1,3 @@
-action: submit
-gpus: 0
-test: true
-milestone: core_claim_plus
-notes: "Audit passed; rerun compact NBF reproduction with held-out attack-family generalization enabled to evaluate the secondary generalization claim."
+action: done
+milestone: secondary_claims
+notes: "Reproduced the core NBF safety/helpfulness trade-off plus held-out attack-family generalization on the local benchmark; validation passes."

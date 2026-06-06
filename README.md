@@ -64,9 +64,11 @@ The primary claim is that this guardrail lowers multi-turn jailbreak attack succ
 
 The paper reports large reductions in average ASR on open-source Llama-3-8B and Phi-4 models under ActorAttack, Crescendo, and Opposite-day while retaining most MTBench helpfulness and keeping XSTest over-refusal low. The local reproduction uses the same metric types on a compact multi-turn safety benchmark.
 
+A secondary target mirrors the paper's held-out attack-family test: train the guardrail without selected attack families, then evaluate whether it still blocks those omitted families while preserving benign conversations.
+
 ## Evaluation Protocol
 
-Run `scripts/reproduce.sh` to train the submitted guardrail, generate attack and benign filtering decisions, run the keyword baseline, and call `scripts/evaluate.sh`. The evaluator reads only saved outputs in `tmp/outputs/` and writes `scoring/scores.json`; it does not import from `method/`.
+Run `scripts/reproduce.sh` to train the submitted guardrail, generate attack and benign filtering decisions, run the keyword baseline, and call `scripts/evaluate.sh`. Set `RUN_GENERALIZATION=1` to include the held-out attack-family experiment. The evaluator reads only saved outputs in `tmp/outputs/` and writes `scoring/scores.json`; it does not import from `method/`.
 
 ---
 
@@ -117,12 +119,34 @@ Run `scripts/reproduce.sh` to train the submitted guardrail, generate attack and
 
 </details>
 
+### Iteration 3: gpt-5.5
+- **Milestone**: `secondary_claims` | **Status**: done
+- **Working time**: 10m | **GPU**: 0.0h
+- **Jobs**: 5 total (4 completed, 1 failed)
+
+<details>
+<summary>Progress Log</summary>
+
+### [2026-06-06 06:22] - core_claim_plus
+- Existing reproduction already runs the paper's NBF dialogue dynamics and barrier filtering end-to-end on the local benchmark.
+- Existing scores cover the main eta=1e-3 safety/helpfulness trade-off and an eta=0 threshold setting, giving additional coverage beyond the minimum core claim.
+- Added a held-out attack-family generalization experiment modeled on Table 5; next submitted job will determine whether it supports `secondary_claims`.
+
+### [2026-06-06 06:28] - core_claim_plus
+- Continuation audit found the implementation is a recognizable reproduction of the paper's neural state-space plus neural barrier filtering algorithm, not a surrogate model.
+- Verified `python validate.py --compare` passes and that `eval/` reads method outputs without importing from `method/`.
+- Restored `core_claim_plus` based on completed main and eta=0 threshold results; submitting the held-out attack-family run to test whether the milestone can advance.
+
+### [2026-06-06 06:35] - secondary_claims
+- CPU job `a255db70-c05` completed the held-out attack-family generalization run successfully.
+- On attack families omitted from training, NBF steering achieved ASR 0.0, filter recall 1.0, helpfulness retention 0.954, and over-refusal 0.046 on the local benchmark.
+- `python validate.py --compare` passes with both scored experiments, supporting the paper's secondary claim that dialogue-dynamics steering can generalize beyond the attack families seen during NBF training.
+
+</details>
+
 
 ---
 
 # Reproduction Milestones
 
-**Current: core_claim**
-
-## Stop Justification
-- Completed at milestone `core_claim`.
+**Current: secondary_claims**
