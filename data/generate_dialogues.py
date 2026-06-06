@@ -98,14 +98,33 @@ def build_dialogue(idx: int, split: str, attack: str, max_turns: int) -> dict:
     return {"id": f"{split}_{attack}_{idx:04d}", "split": split, "attack": attack, "turns": turns}
 
 
-def generate(out_dir: Path, train_n: int, test_n: int, benign_n: int, max_turns: int, seed: int) -> None:
+def parse_attacks(value: str) -> list[str]:
+    attacks = [item.strip() for item in value.split(",") if item.strip()]
+    valid = {"actor", "crescendo", "opposite", "acronym"}
+    unknown = sorted(set(attacks) - valid)
+    if unknown:
+        raise ValueError(f"unknown attacks: {unknown}; valid attacks are {sorted(valid)}")
+    if not attacks:
+        raise ValueError("at least one attack must be provided")
+    return attacks
+
+
+def generate(
+    out_dir: Path,
+    train_n: int,
+    test_n: int,
+    benign_n: int,
+    max_turns: int,
+    seed: int,
+    train_attacks: list[str],
+    test_attacks: list[str],
+    benign_attacks: list[str],
+) -> None:
     random.seed(seed)
     out_dir.mkdir(parents=True, exist_ok=True)
-    attacks = ["actor", "crescendo", "opposite", "acronym"]
-    train = [build_dialogue(i, "train", attacks[i % len(attacks)], max_turns) for i in range(train_n)]
-    test_attacks = ["actor", "crescendo", "opposite"]
+    train = [build_dialogue(i, "train", train_attacks[i % len(train_attacks)], max_turns) for i in range(train_n)]
     test = [build_dialogue(i, "test", test_attacks[i % len(test_attacks)], max_turns) for i in range(test_n)]
-    benign = [build_dialogue(i, "benign", test_attacks[i % len(test_attacks)], max_turns) for i in range(benign_n)]
+    benign = [build_dialogue(i, "benign", benign_attacks[i % len(benign_attacks)], max_turns) for i in range(benign_n)]
     for name, rows in [("train.jsonl", train), ("test_attacks.jsonl", test), ("benign.jsonl", benign)]:
         with (out_dir / name).open("w", encoding="utf-8") as f:
             for row in rows:
@@ -118,6 +137,9 @@ def generate(out_dir: Path, train_n: int, test_n: int, benign_n: int, max_turns:
         "benign_dialogues": benign_n,
         "max_turns": max_turns,
         "seed": seed,
+        "train_attacks": train_attacks,
+        "test_attacks": test_attacks,
+        "benign_attacks": benign_attacks,
     }
     (out_dir / "README.json").write_text(json.dumps(meta, indent=2) + "\n", encoding="utf-8")
 
@@ -130,5 +152,20 @@ if __name__ == "__main__":
     parser.add_argument("--benign-n", type=int, default=180)
     parser.add_argument("--max-turns", type=int, default=8)
     parser.add_argument("--seed", type=int, default=7)
+    parser.add_argument("--train-attacks", default="actor,crescendo,opposite,acronym")
+    parser.add_argument("--test-attacks", default="actor,crescendo,opposite")
+    parser.add_argument("--benign-attacks", default=None)
     args = parser.parse_args()
-    generate(Path(args.out_dir), args.train_n, args.test_n, args.benign_n, args.max_turns, args.seed)
+    test_attacks = parse_attacks(args.test_attacks)
+    benign_attacks = parse_attacks(args.benign_attacks) if args.benign_attacks else test_attacks
+    generate(
+        Path(args.out_dir),
+        args.train_n,
+        args.test_n,
+        args.benign_n,
+        args.max_turns,
+        args.seed,
+        parse_attacks(args.train_attacks),
+        test_attacks,
+        benign_attacks,
+    )

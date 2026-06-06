@@ -9,6 +9,7 @@
 - CPU smoke job executed training and prediction end-to-end.
 - The latest passed job validates the core safety/helpfulness claim on the local benchmark.
 - CPU job `7c0e9d97-0bb` also ran an eta=0 threshold setting, giving additional coverage beyond the minimum core claim.
+- Added a Table 5-style held-out attack generalization experiment. It trains the same NBF method without ActorAttack and Opposite-day style trajectories, then evaluates on those held-out families.
 
 ## Results
 
@@ -22,7 +23,8 @@ An exploratory no-`L_SI` ablation achieved ASR 0.0, filter recall 1.0, helpfulne
 
 ## Remaining
 
-- A higher milestone would require broader coverage, such as leave-one-attack-out generalization or reproducing more of the closed/open-source LLM tables.
+- The next submitted job will run the held-out attack generalization experiment. If it improves ASR while retaining benign turns, it will support the paper's secondary generalization claim.
+- Higher milestones after that would require broader coverage, such as additional embedding backbones, loss ablations that match the paper's direction, or more closed/open-source LLM table coverage.
 - Exact paper-scale reproduction remains out of scope without the API-generated attack transcripts, paid model access, and larger training budget.
 
 ## Issues
@@ -37,3 +39,4 @@ An exploratory no-`L_SI` ablation achieved ASR 0.0, filter recall 1.0, helpfulne
 - Data: the paper trains on GPT-3.5 responses to Circuit Breakers-derived multi-turn attacks and evaluates on HarmBench-derived attacks judged by GPT-4o. This reproduction uses a local synthetic multi-turn safety dataset with the same safe-score convention because paid APIs and unreleased generated transcripts are not usable in this environment.
 - Embedding scale: the paper defaults to all-mpnet-base-v2 with 768-dimensional embeddings. This reproduction uses all-MiniLM-L6-v2 with 384-dimensional embeddings to keep the first CPU smoke test small. The state-space and NBF procedure is unchanged.
 - Training scale: the paper trains dynamics and NBF for 200 epochs each. The first submitted job uses fewer epochs for a smoke test and can be scaled up after results are inspected.
+- Held-out generalization scale: the paper reports held-out attack results on API-generated LLM conversations. This reproduction uses the same train-without/test-on-held-out protocol on the local synthetic trajectory benchmark.

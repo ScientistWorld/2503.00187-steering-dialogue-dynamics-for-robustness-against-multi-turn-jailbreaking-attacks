@@ -13,6 +13,8 @@
 
 The paper reports large reductions in average ASR on open-source Llama-3-8B and Phi-4 models under ActorAttack, Crescendo, and Opposite-day while retaining most MTBench helpfulness and keeping XSTest over-refusal low. The local reproduction uses the same metric types on a compact multi-turn safety benchmark.
 
+A secondary target mirrors the paper's held-out attack-family test: train the guardrail without selected attack families, then evaluate whether it still blocks those omitted families while preserving benign conversations.
+
 ## Evaluation Protocol
 
-Run `scripts/reproduce.sh` to train the submitted guardrail, generate attack and benign filtering decisions, run the keyword baseline, and call `scripts/evaluate.sh`. The evaluator reads only saved outputs in `tmp/outputs/` and writes `scoring/scores.json`; it does not import from `method/`.
+Run `scripts/reproduce.sh` to train the submitted guardrail, generate attack and benign filtering decisions, run the keyword baseline, and call `scripts/evaluate.sh`. Set `RUN_GENERALIZATION=1` to include the held-out attack-family experiment. The evaluator reads only saved outputs in `tmp/outputs/` and writes `scoring/scores.json`; it does not import from `method/`.

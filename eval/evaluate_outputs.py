@@ -53,6 +53,8 @@ def main():
     parser.add_argument("--include-loss-ablation", action="store_true")
     parser.add_argument("--baseline-output", default="tmp/outputs/baseline_attacks.json")
     parser.add_argument("--baseline-benign-output", default="tmp/outputs/baseline_benign.json")
+    parser.add_argument("--heldout-attack-output", default="tmp/outputs/nbf_heldout_attacks.json")
+    parser.add_argument("--heldout-benign-output", default="tmp/outputs/nbf_heldout_benign.json")
     parser.add_argument("--scores", default="scoring/scores.json")
     args = parser.parse_args()
 
@@ -88,6 +90,22 @@ def main():
         }
 
     experiments = {"open_source_multiturn_safety_tradeoff": {"results": results}}
+
+    if Path(args.heldout_attack_output).exists() and Path(args.heldout_benign_output).exists():
+        heldout_attack = score_method(args.heldout_attack_output)
+        heldout_benign = score_method(args.heldout_benign_output)
+        experiments["heldout_attack_generalization"] = {
+            "results": {
+                "nbf_heldout_steering": {
+                    "asr": heldout_attack["overall"]["asr"],
+                    "filter_recall": heldout_attack["overall"]["filter_recall"],
+                    "prompt_harmfulness_f1": heldout_attack["overall"]["prompt_harmfulness_f1"],
+                    "helpfulness_retention": heldout_benign["overall"]["helpfulness_retention"],
+                    "over_refusal_rate": heldout_benign["overall"]["over_refusal_rate"],
+                    "guard_model_params_M": 23.1,
+                }
+            }
+        }
 
     if args.include_loss_ablation and Path(args.no_si_attack_output).exists() and Path(args.no_si_benign_output).exists():
         ablation_results = {}
