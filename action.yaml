@@ -27,8 +27,6 @@
 #   milestone: core_claim
 #   notes: "Reproduced the core claim. Environment packaged."
 
-action: submit
-gpus: 0
-test: true
-milestone: core_claim
-notes: "Final CPU verification after cleaning wrapper scripts and adding the eta=0 threshold variant; regenerates scores and runs validation."
+action: done
+milestone: core_claim_plus
+notes: "Reproduced the core NBF steering claim on the local multi-turn benchmark and added an eta=0 threshold setting; final scripts and scoring validate successfully."

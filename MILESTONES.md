@@ -1,6 +1,6 @@
 # Reproduction Milestones
 
-**Current: core_claim**
+**Current: core_claim_plus**
 
 <!-- Milestone levels (update "Current" above as you progress):
   none             — just started, no meaningful progress yet
@@ -30,5 +30,10 @@
 - NBF steering reduced attack success to 0.0 on the local multi-turn split while retaining 0.958 benign helpfulness.
 - The keyword guard baseline remained nontrivial, with attack success 0.433 and benign over-refusal 0.175.
 
+### [2026-06-06 06:03] - core_claim_plus
+- Final verification job passed with cleaned scripts and regenerated `scoring/scores.json`.
+- Added the eta=0 threshold setting: it retained all benign prompts but had much higher attack success, exposing the threshold safety/helpfulness trade-off.
+- The stronger eta=1e-3 setting remains the reproduced core result.
+
 ## Stop Justification
-- Not stopped.
+- Reproduction packaged and validated at `core_claim_plus`; broader paper coverage would require paid/API-generated datasets or substantially larger experimental matrices.

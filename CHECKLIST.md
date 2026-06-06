@@ -32,13 +32,13 @@ Check off items as you complete them. Order doesn't matter — work however make
 - [x] `environment/container.def` + `environment/setup.sh`
 
 ## Data
-- [ ] Dataset acquired (shared dir or `data/`)
-- [ ] Pretrained models downloaded if needed
+- [x] Dataset acquired (shared dir or `data/`)
+- [x] Pretrained models downloaded if needed
 
 ## Milestones
 - [x] `method_runs` — executes end-to-end without errors
 - [x] `core_claim` — minimum experiment supports central claim
-- [ ] `core_claim_plus` — additional settings
+- [x] `core_claim_plus` — additional settings
 - [ ] `secondary_claims`
 - [ ] `majority`
 - [ ] `near_complete`

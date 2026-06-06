@@ -15,16 +15,18 @@ Latest passed job wrote `scoring/scores.json`: NBF steering achieved ASR 0.0, fi
 
 This supports the core claim on the local substitute benchmark: the paper's neural barrier filtering blocks substantially more multi-turn unsafe turns while preserving more benign interactions than the lightweight lexical guard.
 
+The eta=0 threshold variant achieved ASR 0.503, filter recall 0.497, prompt harmfulness F1 0.664, helpfulness retention 1.0, and over-refusal 0.0. This provides an additional setting for the paper's threshold trade-off: weaker filtering preserves benign prompts but allows many more unsafe turns through.
+
 ## Remaining
 
-- Run the cleaned scripts once more after adding the eta=0 threshold variant.
-- A higher milestone would require broader coverage, such as leave-one-attack-out generalization or loss ablations.
+- A higher milestone would require broader coverage, such as leave-one-attack-out generalization, loss ablations, or reproducing more of the closed/open-source LLM tables.
+- Exact paper-scale reproduction remains out of scope without the API-generated attack transcripts, paid model access, and larger training budget.
 
 ## Issues
 
 - The full paper setup depends on paid GPT/Claude APIs and API-generated attack transcripts. Paid APIs are disallowed, so the autonomous gym uses a local substitute dataset.
 - The first job failed validation because local method names were not listed in `reference.json`; this has been fixed.
-- The eta=0 threshold variant has been added to the evaluator and will be populated by the next verification job.
+- The eta=0 threshold result is weaker than the paper's eta=0 numbers on the local substitute benchmark; the stronger eta=1e-3 threshold supports the reproduced core claim.
 
 ## Deviations from Paper
 
