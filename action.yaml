@@ -5,4 +5,4 @@ action: submit
 gpus: 0
 test: false
 milestone: secondary_claims
-notes: "Run evaluate_train.sh and evaluate_test.sh against saved final outputs to populate split scores."
+notes: "Re-run split scoring after adding zero-buffer margin stress metrics to reduce thresholded-metric saturation."
