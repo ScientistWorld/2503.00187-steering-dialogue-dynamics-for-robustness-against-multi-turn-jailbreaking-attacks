@@ -213,7 +213,11 @@ def predict(args):
                 margin = barrier_margin(logits).item()
                 pred = int(logits.argmax(-1).item()) + 1
                 filtered = margin + args.threshold >= 0
-                x, _ = ssm(x, u)
+                if filtered:
+                    state_advanced = False
+                else:
+                    x, _ = ssm(x, u)
+                    state_advanced = True
                 turns.append({
                     "turn": turn_idx + 1,
                     "attack": row["attack"],
@@ -221,6 +225,7 @@ def predict(args):
                     "pred_score": pred,
                     "barrier_margin": margin,
                     "filtered": bool(filtered),
+                    "state_advanced": state_advanced,
                 })
             out.append({"id": row["id"], "split": row["split"], "attack": row["attack"], "turns": turns})
     Path(args.output).parent.mkdir(parents=True, exist_ok=True)

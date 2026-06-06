@@ -15,4 +15,4 @@ Tests whether a guardrail trained without selected attack families still filters
 - **Constraint metrics**: `helpfulness_retention` (higher is better), `over_refusal_rate` and `guard_model_params_M` (lower is better)
 - **Robustness diagnostics**: worst-family and zero-buffer metrics use the same definitions as the primary experiment.
 - **Held-out axis**: training excludes ActorAttack and Opposite-day style trajectories while evaluation uses them.
-- **Run**: set `RUN_GENERALIZATION=1` before `scripts/reproduce.sh`, then inspect `scoring/scores.json`
+- **Run**: `scripts/reproduce.sh`, then inspect `scoring/scores.json`; set `RUN_GENERALIZATION=0` only for a shorter smoke run that intentionally omits this target.

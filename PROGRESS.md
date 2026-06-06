@@ -14,12 +14,14 @@
 - The evaluator now reports all default contract metrics declared in `reference.json`, including worst per-attack-family safety/helpfulness metrics and zero-buffer barrier diagnostics.
 - Guard model size is read from saved output metadata, so future methods can be scored under the same size constraint without editing `eval/`.
 - Final verification passed after tightening method-agnostic scoring documentation, requiring guard-size metadata in train/test scorers, and confirming the download URL and validation suite.
+- Follow-up audit found and fixed an offline-steering fidelity issue: filtered queries now leave the NBF latent dialogue state unchanged instead of advancing through blocked prompts.
+- `scripts/run.sh` now regenerates method outputs, baseline outputs, train/test scores, and validation results from a fresh job entrypoint.
 
 ## Results
 
 Latest passed job `a255db70-c05` wrote the scored artifacts that were re-evaluated after the scoring-contract fix. NBF steering achieved ASR 0.0, max attack ASR 0.0, filter recall 1.0, prompt harmfulness F1 1.0, helpfulness retention 1.0, over-refusal 0.0, and guard size 23.1M on the main local benchmark. The keyword baseline achieved ASR 0.433, max attack ASR 0.512, filter recall 0.567, prompt harmfulness F1 0.683, helpfulness retention 0.825, and over-refusal 0.175.
 
-This supports the core claim on the local substitute benchmark: the paper's neural barrier filtering blocks substantially more multi-turn unsafe turns while preserving more benign interactions than the lightweight lexical guard.
+These numbers were produced before the filtered-state fix and are now treated as stale until the next submitted job regenerates `tmp/outputs` and `scoring/scores.json` under the corrected steering semantics.
 
 The eta=0 threshold diagnostic achieved ASR 0.617, filter recall 0.383, prompt harmfulness F1 0.554, helpfulness retention 1.0, and over-refusal 0.0. Because this is too far from the paper's eta=0 ASR to pass consistency validation, it is documented as exploratory and excluded from the default scored contract.
 
@@ -31,6 +33,7 @@ An exploratory no-`L_SI` ablation achieved ASR 0.0, filter recall 1.0, helpfulne
 
 - Higher milestones would require broader coverage, such as additional embedding backbones, loss ablations that match the paper's direction, or more closed/open-source LLM table coverage.
 - Exact paper-scale reproduction remains out of scope without the API-generated attack transcripts, paid model access, and larger training budget.
+- The next job must confirm whether the corrected online-steering state update restores the previous `core_claim`/`secondary_claims` results on the local benchmark.
 
 ## Issues
 
@@ -39,6 +42,7 @@ An exploratory no-`L_SI` ablation achieved ASR 0.0, filter recall 1.0, helpfulne
 - The eta=0 threshold result is weaker than the paper's eta=0 numbers on the local substitute benchmark and is not included in default `scores.json`; the stronger eta=1e-3 threshold supports the reproduced core claim.
 - The no-`L_SI` ablation does not match the paper's exact ASR direction on the substitute benchmark; it instead demonstrates that loss changes can shift the guard toward over-refusal.
 - The final verifier removed method-specific language from from-scratch-facing scoring guidance and kept the held-out primary metadata on a paper-reported metric while retaining ASR and zero-buffer ASR as weighted safety objectives.
+- A follow-up audit identified that filtered turns were still advancing the latent state during offline prediction. This has been patched, but the current checked-in scores are stale until the submitted rerun finishes.
 
 ## Deviations from Paper
 

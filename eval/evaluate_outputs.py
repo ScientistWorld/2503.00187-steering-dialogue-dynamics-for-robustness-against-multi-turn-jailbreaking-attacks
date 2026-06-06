@@ -75,7 +75,7 @@ def score_method(path):
     }
 
 
-def combine_result(attack, benign):
+def combine_result(attack, benign, require_guard_params=True):
     attack_families = list(attack["by_attack"].values())
     benign_families = list(benign["by_attack"].values())
     result = {
@@ -95,6 +95,8 @@ def combine_result(attack, benign):
     guard_params = attack["guard_model_params_M"]
     if guard_params is None:
         guard_params = benign["guard_model_params_M"]
+    if guard_params is None and require_guard_params:
+        raise SystemExit("Non-baseline outputs must declare guard_model_params_M")
     result["guard_model_params_M"] = 0.0 if guard_params is None else guard_params
     return result
 
@@ -123,7 +125,7 @@ def main():
     def add_nbf_result(name, attack_path, benign_path):
         attack = score_method(attack_path)
         benign = score_method(benign_path)
-        results[name] = combine_result(attack, benign)
+        results[name] = combine_result(attack, benign, require_guard_params=True)
 
     add_nbf_result("nbf_steering", args.attack_output, args.benign_output)
     if args.include_threshold_axis and Path(args.eta0_attack_output).exists() and Path(args.eta0_benign_output).exists():
@@ -131,7 +133,7 @@ def main():
 
     if baseline_attack:
         base_benign = score_method(args.baseline_benign_output)
-        results["keyword_guard"] = combine_result(baseline_attack, base_benign)
+        results["keyword_guard"] = combine_result(baseline_attack, base_benign, require_guard_params=False)
 
     experiments = {"open_source_multiturn_safety_tradeoff": {"results": results}}
 
@@ -140,7 +142,7 @@ def main():
         heldout_benign = score_method(args.heldout_benign_output)
         experiments["heldout_attack_generalization"] = {
             "results": {
-                "nbf_heldout_steering": combine_result(heldout_attack, heldout_benign)
+                "nbf_heldout_steering": combine_result(heldout_attack, heldout_benign, require_guard_params=True)
             }
         }
 
@@ -150,8 +152,8 @@ def main():
         full_benign = score_method(args.eta0_benign_output)
         no_si_attack = score_method(args.no_si_attack_output)
         no_si_benign = score_method(args.no_si_benign_output)
-        ablation_results["nbf_full_eta_0"] = combine_result(full_attack, full_benign)
-        ablation_results["nbf_no_invariance_loss_eta_0"] = combine_result(no_si_attack, no_si_benign)
+        ablation_results["nbf_full_eta_0"] = combine_result(full_attack, full_benign, require_guard_params=True)
+        ablation_results["nbf_no_invariance_loss_eta_0"] = combine_result(no_si_attack, no_si_benign, require_guard_params=True)
         experiments["loss_ablation_eta_0"] = {"results": ablation_results}
 
     scores = {"experiments": experiments}

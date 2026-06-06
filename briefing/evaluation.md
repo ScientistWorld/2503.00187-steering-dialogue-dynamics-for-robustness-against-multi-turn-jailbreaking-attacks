@@ -17,4 +17,4 @@ A secondary target mirrors the paper's held-out attack-family test: train the gu
 
 ## Evaluation Protocol
 
-Run `scripts/reproduce.sh` to train the submitted guardrail, generate attack and benign filtering decisions, run the keyword baseline, and call `scripts/evaluate.sh`. Set `RUN_GENERALIZATION=1` to include the held-out attack-family experiment. The evaluator reads only saved outputs in `tmp/outputs/` and writes `scoring/scores.json`; it does not import from `method/`.
+Run `scripts/reproduce.sh` to train the submitted guardrail, generate attack and benign filtering decisions, run the keyword baseline, and call `scripts/evaluate.sh`. The held-out attack-family experiment is enabled by default; set `RUN_GENERALIZATION=0` only for a shorter smoke run. The evaluator reads only saved outputs in `tmp/outputs/` and writes `scoring/scores.json`; it does not import from `method/`.
