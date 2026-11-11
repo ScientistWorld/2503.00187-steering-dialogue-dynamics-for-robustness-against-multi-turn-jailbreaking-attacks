@@ -1,4 +1,3 @@
-action: submit
-gpus: 1
-test: false
-notes: "Resume focused audit after fixing prediction launcher; reuse completed seed-13 checkpoint, finish 3-seed safe-transition fix and long ablation, then summarize all runs."
+action: done
+milestone: core_claim
+notes: "Audit committed as 75b2ed5: 31 variants; quality changes below seed spread; major shortcuts reach perfect scores; original gym files restored."
