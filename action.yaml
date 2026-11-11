@@ -2,7 +2,7 @@
 # Do NOT sleep, poll, or wait for jobs. The system reads this file
 # only after your turn ends.
 action: submit
-gpus: 1
+gpus: 0
 test: false
-milestone: core_claim
-notes: "Full paper-scale hardening run (200+200 epochs): visible-overlap mask, reference NBF + baseline, official train/test scores, 3-seed spread (NBF and baseline), threshold sweeps, 1-epoch weaker, L_SI/L_SS/kappa ablations, benign-augmented and ensemble variants, shortcut guards incl. hidden-test lookup probe, panel scoring on train+test, paired bootstrap"
+milestone: core_claim_plus
+notes: "CPU only: recompute paired-bootstrap rank comparison of the saved hardening panel decisions under the final reference.json coefficients (no retraining, no guard re-execution), plus validate.py"

@@ -1,7 +1,7 @@
 #!/bin/bash
-# Job entry point (iteration 11 hardening check, paper scale). Afterwards this file is reset to
-# the end-to-end reference reproduction: reproduce -> evaluate_train -> evaluate_test.
+# Job entry point (iteration 11: rescore the hardening panel under the final coefficients,
+# CPU only). Afterwards this file is reset to the end-to-end reference reproduction.
 set -euo pipefail
 cd /home/user
-SMOKE=0 bash hardening/run_hardening.sh
+bash hardening/rescore_rank.sh
 python validate.py --post-design || true

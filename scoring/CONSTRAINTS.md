@@ -1,17 +1,21 @@
 # Scientist Constraints
 
 ## Data
-Use the provided `data/local_dialogues` generator and its fixed train, attack-test, and benign-test splits. Do not add external labeled safety data or regenerate the test split with easier examples.
+- Train only on visible data: the Circuit Breakers dialogues in `data/downloads/nbf_cb` (fetched by `scripts/download.sh`) and the benign train/dev prompts in `data/benign/`. The dev split is for model selection and the train-slice score.
+- Do not fetch, embed, or train on the hidden-test sources: the HarmBench members of the authors' release archive, or the XSTest / JailbreakBench / MMLU / MT-Bench items of the hidden benign split. Do not read `eval/test/`.
+- External labelled safety data or other public models may only be used if they contain none of the above.
 
-## Guard Size
-The guardrail, including any embedding model it requires at inference, must remain no larger than the paper-scale guardrail budget of 115M parameters unless the larger size is explicitly penalized through `guard_model_params_M`.
+## Guard
+- One TorchScript file per method in `tmp/outputs/guards/`, implementing the interface in `briefing/evaluation.md`. It receives only query embeddings (768-d all-mpnet-base-v2); it has no access to text, responses or labels at test time.
+- At most 25M parameters + buffers and a file of at most 110 MiB. The sentence encoder is fixed and is not counted.
+- The guard must be stateless across dialogues; the evaluator enforces this by reloading it.
 
 ## Evaluation
-The evaluator must consume saved outputs from `tmp/outputs/` and must not import from `method/`. The test split must not be used for fitting thresholds, training classifiers, or selecting checkpoints.
+- `scripts/evaluate_train.sh` and `scripts/evaluate_test.sh` take no arguments, score every guard on disk, never import `method/`, and recompute every number from their own labels.
+- Thresholds, checkpoints and hyperparameters must be chosen on visible data only.
 
 ## Compliance Checklist
-- [ ] Uses only the provided local dialogue train split for training
-- [ ] Does not train or tune on `test_attacks.jsonl` or `benign.jsonl`
-- [ ] Reports `asr`, helpfulness/over-refusal constraints, and guard size
-- [ ] `scripts/evaluate.sh` works without importing `method/`
-- [ ] Loss ablations change only the targeted loss weight, not data, threshold, or model size
+- [ ] Trained and tuned only on visible data (no HarmBench release members, no hidden benign items)
+- [ ] Guard follows the interface and size limits
+- [ ] Reports all seven metrics through the evaluators, not self-computed numbers
+- [ ] Improvements are not obtained by filtering whole attack-style conversations (safe-turn filter rate) or by over-refusing benign traffic
