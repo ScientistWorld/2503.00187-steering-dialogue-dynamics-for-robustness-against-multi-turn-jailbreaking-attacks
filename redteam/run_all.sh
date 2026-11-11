@@ -22,4 +22,4 @@ for variant in "${variants[@]}"; do
     echo "AUDIT_ERROR $variant $(date -u +%FT%TZ)"
   fi
 done
-python redteam/summarize.py
+bash redteam/run_followup.sh

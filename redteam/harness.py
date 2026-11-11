@@ -85,11 +85,11 @@ def train_variant(name):
     elif name == 'better_no_invariance_200':
         epochs = (200, 200)
         extra = ['--invariance-weight', '0']
-    source = 'method/nbf_llm.py'
+    model_script = 'method/nbf_llm.py'
     if name.startswith('better_safe_transition_seed_'):
-        source = 'redteam/better_safe_transition/nbf_llm.py'
+        model_script = 'redteam/better_safe_transition/nbf_llm.py'
     ckpt = STATE / 'checkpoints' / name
-    cmd = [sys.executable, source, 'train',
+    cmd = [sys.executable, model_script, 'train',
            '--train-data', 'data/local_dialogues/train.jsonl',
            '--embedding-model', 'data/downloads/all-MiniLM-L6-v2',
            '--cache', 'tmp/train_embeddings.pt', '--out-dir', str(ckpt),
@@ -97,13 +97,14 @@ def train_variant(name):
            '--batch-size', '64', '--seed', str(seed), *extra]
     write(folder / 'training_config.json', {'seed': seed, 'ssm_epochs': epochs[0],
           'nbf_epochs': epochs[1], 'extra': extra, 'command': cmd})
-    if command(cmd, folder / 'training.log') != 0:
-        raise RuntimeError(f'training failed: {name}')
-    for split, source, cache in [('attacks', 'test_attacks', 'test'),
+    if not (ckpt / 'nbf_model.pt').exists():
+        if command(cmd, folder / 'training.log') != 0:
+            raise RuntimeError(f'training failed: {name}')
+    for split, data_source, cache in [('attacks', 'test_attacks', 'test'),
                                  ('benign', 'benign', 'benign')]:
-        cmd = [sys.executable, source, 'predict',
+        cmd = [sys.executable, model_script, 'predict',
                '--model-path', str(ckpt / 'nbf_model.pt'),
-               '--input-data', f'data/local_dialogues/{source}.jsonl',
+               '--input-data', f'data/local_dialogues/{data_source}.jsonl',
                '--cache', f'tmp/{cache}_embeddings.pt', '--threshold', '0.001',
                '--output', str(OUT / f'nbf_{split}.json')]
         if command(cmd, folder / 'prediction.log') != 0:
