@@ -5,4 +5,4 @@ action: submit
 gpus: 1
 test: true
 milestone: core_claim
-notes: "Smoke test (2 epochs) of the rebuilt gym: benign embeddings, reference NBF + baseline, official train/test scoring, variants, shortcut guards, panel scoring, paired bootstrap"
+notes: "Smoke test #2 (2 epochs) after JSONL fix: benign embeddings, reference NBF + baseline, official scoring, variants, shortcuts, panel test scoring, paired bootstrap"

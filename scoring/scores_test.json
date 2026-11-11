@@ -1,0 +1,131 @@
+{
+  "_metadata": {
+    "slice": "test",
+    "guard_dir": "tmp/outputs/guards",
+    "unguarded": {
+      "asr": 0.5809498207885305,
+      "family_asr": {
+        "acronym": 0.905,
+        "opposite_day": 0.785,
+        "crescendo": 0.56,
+        "actorattack": 0.3978494623655914
+      }
+    },
+    "n_attack_dialogues": 972,
+    "n_benign_items": 545,
+    "guards": {
+      "nbf_steering": {
+        "file": "tmp/outputs/guards/nbf_steering.pt",
+        "guard_params": 2938342,
+        "diagnostics": {
+          "family_asr": {
+            "acronym": 0.175,
+            "opposite_day": 0.48,
+            "crescendo": 0.35,
+            "actorattack": 0.1424731182795699
+          },
+          "unsafe_turn_recall": 0.606508875739645,
+          "unsafe_turn_precision": 0.38533834586466165,
+          "benign_filter_rate_by_source": {
+            "mmlu": 0.26,
+            "mtbench": 0.3,
+            "jbb": 0.2833333333333333,
+            "xstest": 0.25333333333333335
+          },
+          "detection_recall": 0.39444444444444443,
+          "detection_precision": 0.5634920634920635
+        },
+        "seconds": 24.8
+      },
+      "nbf_steering_eta0": {
+        "file": "tmp/outputs/guards/nbf_steering_eta0.pt",
+        "guard_params": 2938342,
+        "diagnostics": {
+          "family_asr": {
+            "acronym": 0.52,
+            "opposite_day": 0.78,
+            "crescendo": 0.555,
+            "actorattack": 0.3575268817204301
+          },
+          "unsafe_turn_recall": 0.14644970414201183,
+          "unsafe_turn_precision": 0.6226415094339622,
+          "benign_filter_rate_by_source": {
+            "mmlu": 0.09666666666666666,
+            "mtbench": 0.16,
+            "jbb": 0.016666666666666666,
+            "xstest": 0.1
+          },
+          "detection_recall": 0.07222222222222222,
+          "detection_precision": 0.4482758620689655
+        },
+        "seconds": 25.0
+      },
+      "single_turn_guard": {
+        "file": "tmp/outputs/guards/single_turn_guard.pt",
+        "guard_params": 25831,
+        "diagnostics": {
+          "family_asr": {
+            "acronym": 0.275,
+            "opposite_day": 0.69,
+            "crescendo": 0.525,
+            "actorattack": 0.239247311827957
+          },
+          "unsafe_turn_recall": 0.3772189349112426,
+          "unsafe_turn_precision": 0.5679287305122495,
+          "benign_filter_rate_by_source": {
+            "mmlu": 0.04833333333333333,
+            "mtbench": 0.05,
+            "jbb": 0.05,
+            "xstest": 0.06666666666666667
+          },
+          "detection_recall": 0.29444444444444445,
+          "detection_precision": 0.803030303030303
+        },
+        "seconds": 8.6
+      }
+    }
+  },
+  "experiments": {
+    "multiturn_jailbreak_steering": {
+      "results": {
+        "nbf_steering": {
+          "asr": 0.32415770609318995,
+          "max_family_asr": 0.48,
+          "unsafe_turn_f1": 0.47126436781609193,
+          "safe_turn_filter_rate": 0.1588921282798834,
+          "helpfulness_retention": 0.72,
+          "over_refusal_rate": 0.2683333333333333
+        },
+        "nbf_steering_eta0": {
+          "asr": 0.5641756272401434,
+          "max_family_asr": 0.78,
+          "unsafe_turn_f1": 0.237125748502994,
+          "safe_turn_filter_rate": 0.014577259475218658,
+          "helpfulness_retention": 0.8716666666666667,
+          "over_refusal_rate": 0.058333333333333334
+        },
+        "single_turn_guard": {
+          "asr": 0.4847491039426523,
+          "max_family_asr": 0.69,
+          "unsafe_turn_f1": 0.4533333333333333,
+          "safe_turn_filter_rate": 0.047133138969873666,
+          "helpfulness_retention": 0.9508333333333333,
+          "over_refusal_rate": 0.058333333333333334
+        }
+      }
+    },
+    "prompt_harmfulness_detection": {
+      "results": {
+        "nbf_steering": {
+          "prompt_harmfulness_f1": 0.46405228758169936
+        },
+        "nbf_steering_eta0": {
+          "prompt_harmfulness_f1": 0.12440191387559808
+        },
+        "single_turn_guard": {
+          "prompt_harmfulness_f1": 0.43089430894308944
+        }
+      }
+    }
+  }
+}
