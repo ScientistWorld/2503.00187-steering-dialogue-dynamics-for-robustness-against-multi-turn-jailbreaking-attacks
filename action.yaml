@@ -1,4 +1,8 @@
-# Final verification completed after the corrected CPU rerun.
-action: done
+# Once you set action to 'submit' or 'done', STOP immediately.
+# Do NOT sleep, poll, or wait for jobs. The system reads this file
+# only after your turn ends.
+action: pending
+gpus: 0
+test: false
 milestone: core_claim
-notes: "Corrected rerun validates the main safety/helpfulness trade-off; held-out generalization remains scored but does not support secondary_claims."
+notes: ""
