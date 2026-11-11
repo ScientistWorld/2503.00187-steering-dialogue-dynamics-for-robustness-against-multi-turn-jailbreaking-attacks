@@ -1,8 +1,6 @@
 # Once you set action to 'submit' or 'done', STOP immediately.
 # Do NOT sleep, poll, or wait for jobs. The system reads this file
 # only after your turn ends.
-action: submit
-gpus: 0
-test: false
+action: done
 milestone: core_claim_plus
-notes: "CPU only: recompute paired-bootstrap rank comparison of the saved hardening panel decisions under the final reference.json coefficients (no retraining, no guard re-execution), plus validate.py"
+notes: "Gym rebuilt on authors' released GPT-3.5 jailbreak data with an executed-guard evaluator; reference NBF (paper settings) ASR 0.581->0.165 on hidden HarmBench test; better variants beat it beyond test and seed noise, baseline/weaker/shortcuts rank below; see HARDENING.md"

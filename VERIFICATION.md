@@ -1,25 +1,13 @@
-# Verification Report
+# Verification Report (iteration 11)
 
-## Initial Assessment
-The workspace entered this final check with a prior `secondary_claims` result, but a follow-up patch changed the NBF steering semantics so filtered queries no longer advance the latent dialogue state. A CPU rerun has now regenerated the scored artifacts under the corrected semantics.
+## Checked
+- `python validate.py --post-design` passes (only warning: `eval/test/compare.py` is a maintainer bootstrap tool that reads decision dumps, not a scorer).
+- `scripts/evaluate_test.sh` takes no arguments, scores every `tmp/outputs/guards/*.pt`, overwrites a prewritten `scores_test.json` (probe: `asr -5` -> 0.1646), and writes worst values for failed guards in every metric of both experiments.
+- `scoring/scores_test.json` and `scoring/scores_train.json` hold only the reference runs (`nbf_steering`, `nbf_steering_eta0`, `single_turn_guard`) from job `62478226-05a`, scored by the final evaluators.
+- `eval/` never imports `method/`; `eval/train/` and `eval/test/` share no code; test inputs, labels and the test-data builders live only in `eval/test/`.
+- `scripts/download.sh` fetches the authors' release archive (sha256-checked, only Circuit Breakers members converted, archive deleted) and the pinned all-mpnet-base-v2 revision; nothing references `shared/`.
 
-## Issues Found
-- **Critical**: The previous scored artifacts were stale relative to the patched method. The rerun fixed this, but the corrected held-out result no longer supports the paper's secondary generalization claim.
-- **Critical**: The corrected held-out experiment is too far from the paper's reported ASR/filter-recall values to pass paper-consistency checks, so it cannot remain in default scored artifacts while closing at `core_claim`.
-- **Minor**: Root-level tracked `trajectory/*.jsonl` artifacts were deleted in the worktree but not committed. These raw trajectory files do not belong in the workspace root.
-- **Minor**: `README.md` and `manifest.json` appear as modified character-device files in the worktree. They are unrelated root/system artifacts, so I did not alter them.
-
-## Fixes Applied
-- Committed removal of the tracked root `trajectory/*.jsonl` artifacts.
-- CPU job `e7898f38-d24` regenerated method outputs, baseline outputs, held-out generalization outputs, train/test scores, and validation artifacts with the corrected filtered-state behavior.
-- Removed the failed held-out generalization run from default `scores.json`, `scores_train.json`, and `scores_test.json`; it remains available as an explicitly requested exploratory diagnostic.
-- Verified `python validate.py --compare` passes on the refreshed artifacts.
-- Verified the HuggingFace model endpoint used by `scripts/download.sh` resolves successfully with `curl -I -L --max-time 15`.
-
-## Final Judgment
-The workspace is ready as a `core_claim` gym. The main safety/helpfulness trade-off is reproduced on the local substitute benchmark, evaluation is reusable, method-agnostic files are clean enough for from-scratch agents, and validation passes. The previous `secondary_claims` milestone is not justified after the corrected rerun because held-out attack generalization is weak.
-
-- Milestone: core_claim
+## Final judgment
+- Milestone: core_claim_plus
 - Ready for gym use: yes
-- Confidence: medium
-- Key limitation: benchmark uses local synthetic substitute data, and the corrected held-out generalization experiment is exploratory rather than a reproduced secondary claim.
+- Key limitations: offline replay of GPT-3.5 dialogues; helpfulness/over-refusal are guard pass rates; the L_SI ablation does not reproduce the paper's direction; training on the public HarmBench release cannot be detected by the evaluator (see HARDENING.md).

@@ -1,6 +1,6 @@
 # Reproduction Milestones
 
-**Current: core_claim**
+**Current: core_claim_plus**
 
 ## Progress Log
 
@@ -48,3 +48,8 @@
 - CPU job `e7898f38-d24` regenerated outputs with the corrected filtered-state semantics.
 - The main safety/helpfulness trade-off still supports the core claim: NBF steering reduced ASR from 0.433 for the keyword baseline to 0.133 while retaining all benign turns on the local benchmark.
 - The held-out generalization result no longer supports `secondary_claims` after the fidelity fix: held-out ASR is 0.503, so the workspace is closed at `core_claim` rather than restoring the previous milestone.
+
+### [2026-11-11 11:10] - core_claim_plus
+- Iteration 11 rebuilt the gym on the authors' released GPT-3.5 multi-turn jailbreak data (Circuit Breakers train/dev, HarmBench hidden test) with an evaluator that executes submitted guards, and restored the paper's method settings (mpnet 768-d, 1536-512-512-768 / 1536-32-32-5, 200 + 200 epochs, authors' losses).
+- Hidden test: NBF steering at eta = 1e-3 lowers ASR from 0.581 (unguarded) to 0.165 (paper GPT-3.5: 0.643 -> 0.217) with helpfulness 0.833 and over-refusal 0.288; context-free single-turn guard 0.436. Effect exceeds the 3-seed spread (0.140-0.238).
+- Additional settings in the paper's direction: eta = 0 operating point (ASR 0.379, more helpful), L_SS ablation (ASR 0.533), prompt-harmfulness F1 0.665 (paper 0.710). Not reproduced: L_SI ablation direction; Table 5 and cross-LLM results are not available from the released data.
