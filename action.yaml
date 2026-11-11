@@ -1,4 +1,4 @@
 action: submit
 gpus: 1
 test: false
-notes: "Follow-up audit: test a train-label-only safe-transition loss fix with 3 seeds, a 200-epoch no-invariance variant, and measure actual model size and contradictory training targets."
+notes: "Resume focused audit after fixing prediction launcher; reuse completed seed-13 checkpoint, finish 3-seed safe-transition fix and long ablation, then summarize all runs."

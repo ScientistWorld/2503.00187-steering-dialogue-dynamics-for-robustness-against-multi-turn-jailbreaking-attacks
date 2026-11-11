@@ -1,0 +1,11 @@
+{
+  "embedding_params": 22713216,
+  "ssm_params": 722688,
+  "nbf_params": 25829,
+  "actual_total_params_M": 23.461733,
+  "declared_params_M": 23.1,
+  "invariance_loss_eligible_transitions": 3200,
+  "invariance_targets_with_unsafe_next_turn": 1920,
+  "unsafe_fraction": 0.6,
+  "fix": "Only impose forward safety on training transitions with safe current and next labels; retain all other architecture, loss weights, data, thresholds and epoch counts."
+}

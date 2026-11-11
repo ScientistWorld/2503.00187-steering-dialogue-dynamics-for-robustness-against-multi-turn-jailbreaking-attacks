@@ -1,0 +1,27 @@
+{
+  "seed": 14,
+  "ssm_epochs": 16,
+  "nbf_epochs": 24,
+  "extra": [],
+  "command": [
+    "/usr/local/bin/python",
+    "redteam/better_safe_transition/nbf_llm.py",
+    "train",
+    "--train-data",
+    "data/local_dialogues/train.jsonl",
+    "--embedding-model",
+    "data/downloads/all-MiniLM-L6-v2",
+    "--cache",
+    "tmp/train_embeddings.pt",
+    "--out-dir",
+    "/home/user/redteam/.state/checkpoints/better_safe_transition_seed_14",
+    "--ssm-epochs",
+    "16",
+    "--nbf-epochs",
+    "24",
+    "--batch-size",
+    "64",
+    "--seed",
+    "14"
+  ]
+}
