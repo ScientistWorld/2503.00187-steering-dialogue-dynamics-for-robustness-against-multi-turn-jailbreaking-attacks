@@ -63,6 +63,9 @@ def main() -> None:
     parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--eta", type=float, default=1e-3)
     parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument("--sweep-etas", type=float, nargs="*", default=[],
+                        help="also export the same classifier at these thresholds (trade-off curve)")
+    parser.add_argument("--sweep-prefix", default=None, help="path prefix for sweep exports: <prefix>_eta<eta>.pt")
     args = parser.parse_args()
     torch.manual_seed(args.seed)
     gen = torch.Generator().manual_seed(args.seed)
@@ -93,6 +96,11 @@ def main() -> None:
     Path(args.out).parent.mkdir(parents=True, exist_ok=True)
     guard.save(args.out)
     print(f"exported {args.out}")
+    for eta in args.sweep_etas:
+        tag = f"{eta:g}".replace("-", "m").replace(".", "p")
+        path = f"{args.sweep_prefix}_eta{tag}.pt"
+        torch.jit.script(SingleTurnGuard(clf.eval(), eta).eval()).save(path)
+        print(f"exported {path}")
 
 
 if __name__ == "__main__":

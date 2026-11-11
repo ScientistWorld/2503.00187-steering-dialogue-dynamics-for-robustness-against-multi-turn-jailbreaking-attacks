@@ -3,6 +3,6 @@
 # only after your turn ends.
 action: submit
 gpus: 1
-test: true
+test: false
 milestone: core_claim
-notes: "Smoke test #2 (2 epochs) after JSONL fix: benign embeddings, reference NBF + baseline, official scoring, variants, shortcuts, panel test scoring, paired bootstrap"
+notes: "Full paper-scale hardening run (200+200 epochs): visible-overlap mask, reference NBF + baseline, official train/test scores, 3-seed spread (NBF and baseline), threshold sweeps, 1-epoch weaker, L_SI/L_SS/kappa ablations, benign-augmented and ensemble variants, shortcut guards incl. hidden-test lookup probe, panel scoring on train+test, paired bootstrap"
