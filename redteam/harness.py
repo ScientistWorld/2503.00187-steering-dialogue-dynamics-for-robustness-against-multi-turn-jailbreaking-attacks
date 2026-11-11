@@ -71,7 +71,7 @@ def base_outputs():
 
 def train_variant(name):
     folder = RT / name
-    seed = int(name.rsplit('_', 1)[1]) if name.startswith('reference_seed_') else 13
+    seed = int(name.rsplit('_', 1)[1]) if '_seed_' in name else 13
     epochs = (16, 24)
     extra = []
     if name == 'better_training_200':
@@ -82,8 +82,14 @@ def train_variant(name):
         epochs = (1, 1)
     elif name == 'no_invariance_variant':
         extra = ['--invariance-weight', '0']
+    elif name == 'better_no_invariance_200':
+        epochs = (200, 200)
+        extra = ['--invariance-weight', '0']
+    source = 'method/nbf_llm.py'
+    if name.startswith('better_safe_transition_seed_'):
+        source = 'redteam/better_safe_transition/nbf_llm.py'
     ckpt = STATE / 'checkpoints' / name
-    cmd = [sys.executable, 'method/nbf_llm.py', 'train',
+    cmd = [sys.executable, source, 'train',
            '--train-data', 'data/local_dialogues/train.jsonl',
            '--embedding-model', 'data/downloads/all-MiniLM-L6-v2',
            '--cache', 'tmp/train_embeddings.pt', '--out-dir', str(ckpt),
@@ -95,7 +101,7 @@ def train_variant(name):
         raise RuntimeError(f'training failed: {name}')
     for split, source, cache in [('attacks', 'test_attacks', 'test'),
                                  ('benign', 'benign', 'benign')]:
-        cmd = [sys.executable, 'method/nbf_llm.py', 'predict',
+        cmd = [sys.executable, source, 'predict',
                '--model-path', str(ckpt / 'nbf_model.pt'),
                '--input-data', f'data/local_dialogues/{source}.jsonl',
                '--cache', f'tmp/{cache}_embeddings.pt', '--threshold', '0.001',
@@ -305,8 +311,9 @@ def run(name):
     try:
         if name == 'reference_saved':
             pass
-        elif name.startswith('reference_seed_') or name in [
-                'better_training_200', 'better_training_96', 'weaker_training_1', 'no_invariance_variant']:
+        elif name.startswith(('reference_seed_', 'better_safe_transition_seed_')) or name in [
+                'better_training_200', 'better_training_96', 'weaker_training_1', 'no_invariance_variant',
+                'better_no_invariance_200']:
             train_variant(name)
         else:
             install_shortcut(name)
