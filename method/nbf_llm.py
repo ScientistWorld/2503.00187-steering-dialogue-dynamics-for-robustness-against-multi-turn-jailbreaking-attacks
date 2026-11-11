@@ -1,270 +1,360 @@
+"""Neural dialogue dynamics + neural barrier function (NBF) safety steering.
+
+Reproduction of Hu, Robey & Liu, "Steering Dialogue Dynamics for Robustness
+against Multi-turn Jailbreaking Attacks" (arXiv 2503.00187), following the
+authors' released train.py / build_ssm_nbf.py:
+
+  stage 1  neural state-space model (Eq. 3-4)
+           x_k = f(x_{k-1}, u_k),  z_k = g(x_k, u_k),  x_0 = 0
+           f, g: 3-layer ReLU MLPs (2*768 -> 512 -> 512 -> 768), MSE on response
+           embeddings, Adam 1e-4, 200 epochs, best validation-MSE checkpoint.
+  stage 2  safety predictor h(x_{k-1}, u_k) (2*768 -> 32 -> 32 -> 5 classes)
+           with frozen dynamics, loss = CE + 100 * L_SI + 100 * L_SS
+           (Eqs. 6, 11, 12 as implemented by the authors; kappa = 3,
+           training eta = 0), Adam 1e-3, 200 epochs, best validation-CE checkpoint.
+  steering barrier margin h = p(unsafe) - max_safe p(safe class); a query is
+           filtered iff h(x_{k-1}, u_k) + eta >= 0, and a filtered query never
+           enters the dialogue state (state is not advanced).
+
+The exported guard is a TorchScript module following the gym's guard interface
+(see briefing/evaluation.md): buffer ``initial_state`` and
+``forward(state, u) -> (score, next_state)``; filtered iff score >= 0.
+"""
+
 import argparse
-import json
-import math
+import os
+import sys
+import time
 from pathlib import Path
+from typing import Tuple
 
 import torch
 import torch.nn as nn
-from sentence_transformers import SentenceTransformer
-from torch.utils.data import DataLoader, Dataset, random_split
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from data.nbf_data import DIM, load_benign, load_cb_dialogues, pad_dialogues  # noqa: E402
 
-SAFE_CLASS_COUNT = 4
-UNSAFE_CLASS = 4
-
-
-class TrajectoryDataset(Dataset):
-    def __init__(self, paths, embedder, cache_path=None):
-        self.rows = []
-        for path in paths:
-            with Path(path).open(encoding="utf-8") as f:
-                self.rows.extend(json.loads(line) for line in f)
-        self.max_len = max(len(r["turns"]) for r in self.rows)
-        self.embedder = embedder
-        self.cache_path = Path(cache_path) if cache_path else None
-        if self.cache_path and self.cache_path.exists():
-            payload = torch.load(self.cache_path, map_location="cpu")
-            self.encoded = payload["encoded"]
-            return
-        self.encoded = [self._encode_row(row) for row in self.rows]
-        if self.cache_path:
-            self.cache_path.parent.mkdir(parents=True, exist_ok=True)
-            torch.save({"encoded": self.encoded}, self.cache_path)
-
-    def _encode_row(self, row):
-        users = [t["user"] for t in row["turns"]]
-        assistants = [t["assistant"] for t in row["turns"]]
-        u = torch.tensor(self.embedder.encode(users, normalize_embeddings=True), dtype=torch.float32)
-        z = torch.tensor(self.embedder.encode(assistants, normalize_embeddings=True), dtype=torch.float32)
-        labels = torch.tensor([int(t["score"]) - 1 for t in row["turns"]], dtype=torch.long)
-        attacks = [t.get("attack", row.get("attack", "unknown")) for t in row["turns"]]
-        return {"id": row["id"], "split": row["split"], "attack": row["attack"], "u": u, "z": z, "labels": labels, "attacks": attacks}
-
-    def __len__(self):
-        return len(self.encoded)
-
-    def __getitem__(self, idx):
-        row = self.encoded[idx]
-        dim = row["u"].shape[-1]
-        length = row["u"].shape[0]
-        u = torch.zeros(self.max_len, dim)
-        z = torch.zeros(self.max_len, dim)
-        labels = torch.zeros(self.max_len, dtype=torch.long)
-        mask = torch.zeros(self.max_len)
-        u[:length] = row["u"]
-        z[:length] = row["z"]
-        labels[:length] = row["labels"]
-        mask[:length] = 1
-        return u, z, labels, mask, idx
+NUM_CLASSES = 5
+os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
+torch.use_deterministic_algorithms(True, warn_only=True)
 
 
 class NeuralStateSpaceModel(nn.Module):
-    def __init__(self, dim, hidden_dim):
+    def __init__(self, state_dim: int, input_dim: int, output_dim: int, hidden_dim: int):
         super().__init__()
         self.state_transition = nn.Sequential(
-            nn.Linear(dim * 2, hidden_dim), nn.ReLU(),
+            nn.Linear(state_dim + input_dim, hidden_dim), nn.ReLU(),
             nn.Linear(hidden_dim, hidden_dim), nn.ReLU(),
-            nn.Linear(hidden_dim, dim),
+            nn.Linear(hidden_dim, state_dim),
         )
         self.observation_model = nn.Sequential(
-            nn.Linear(dim * 2, hidden_dim), nn.ReLU(),
+            nn.Linear(state_dim + input_dim, hidden_dim), nn.ReLU(),
             nn.Linear(hidden_dim, hidden_dim), nn.ReLU(),
-            nn.Linear(hidden_dim, dim),
+            nn.Linear(hidden_dim, output_dim),
         )
 
-    def forward(self, x_prev, u):
+    def forward(self, x_prev: torch.Tensor, u: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
         x = self.state_transition(torch.cat([x_prev, u], dim=-1))
-        z_hat = self.observation_model(torch.cat([x, u], dim=-1))
-        return x, z_hat
+        z = self.observation_model(torch.cat([x, u], dim=-1))
+        return x, z
 
 
 class NeuralBarrierFunction(nn.Module):
-    def __init__(self, dim, hidden_dim, classes=5):
+    def __init__(self, state_dim: int, input_dim: int, hidden_dim: int, class_num: int = NUM_CLASSES):
         super().__init__()
         self.nbf = nn.Sequential(
-            nn.Linear(dim * 2, hidden_dim), nn.ReLU(),
+            nn.Linear(state_dim + input_dim, hidden_dim), nn.ReLU(),
             nn.Linear(hidden_dim, hidden_dim), nn.ReLU(),
-            nn.Linear(hidden_dim, classes),
+            nn.Linear(hidden_dim, class_num),
         )
 
-    def forward(self, x_prev, u):
-        return self.nbf(torch.cat([x_prev, u], dim=-1))
+    def forward(self, x: torch.Tensor, u: torch.Tensor) -> torch.Tensor:
+        return self.nbf(torch.cat([x, u], dim=-1))
 
 
-def barrier_margin(logits):
+def barrier_margin(logits: torch.Tensor) -> torch.Tensor:
     probs = torch.softmax(logits, dim=-1)
-    return probs[..., UNSAFE_CLASS] - probs[..., :SAFE_CLASS_COUNT].max(dim=-1).values
+    return probs[..., -1] - probs[..., :-1].max(dim=-1).values
 
 
-def safe_set_loss(logits, labels, mask, eta):
-    margin = barrier_margin(logits) + eta
-    safe = (labels != UNSAFE_CLASS).float()
-    sign = 2 * safe - 1
-    return (torch.relu(sign * margin) * mask).sum() / mask.sum().clamp_min(1)
+def loss_forward_invariance(logits: torch.Tensor, m: torch.Tensor, label: torch.Tensor | None = None) -> torch.Tensor:
+    """Authors' loss_forward_invariance: L_SI when label is None, L_SS otherwise."""
+    margin = barrier_margin(logits)
+    if label is None:
+        loss = torch.relu(margin) * m
+    else:
+        safe = (label != NUM_CLASSES - 1).float()
+        loss = torch.relu((2 * safe - 1) * margin) * m
+    if m.sum() == 0:
+        return torch.zeros((), device=logits.device)
+    return loss.sum() / m.sum()
 
 
-def invariance_loss(next_logits, mask, eta, kappa):
-    margin = barrier_margin(next_logits) + eta
-    inv_mask = torch.zeros_like(mask)
-    if mask.shape[1] > kappa:
-        inv_mask[:, :-kappa] = mask[:, kappa:]
-    return (torch.relu(margin) * inv_mask).sum() / inv_mask.sum().clamp_min(1)
+# --------------------------------------------------------------------------- data
+
+def tensors(split: str, device, extra: list[dict] | None = None):
+    dialogues = load_cb_dialogues(split)
+    if extra:
+        dialogues = dialogues + extra
+    u, y, labels, mask = pad_dialogues(dialogues)
+    return u.to(device), y.to(device), labels.to(device), mask.to(device)
 
 
-def rollout(ssm, nbf, u_batch):
-    batch, steps, dim = u_batch.shape
-    x = torch.zeros(batch, dim, device=u_batch.device)
-    z_hats, logits, next_logits = [], [], []
-    for t in range(steps):
-        u = u_batch[:, t]
-        x_prev = x
-        logits.append(nbf(x_prev, u))
-        x, z_hat = ssm(x_prev, u)
-        z_hats.append(z_hat)
-        u_next = u_batch[:, min(t + 1, steps - 1)]
-        next_logits.append(nbf(x, u_next))
-    return torch.stack(z_hats, 1), torch.stack(logits, 1), torch.stack(next_logits, 1)
-
-
-def train(args):
-    torch.manual_seed(args.seed)
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    embedder = SentenceTransformer(args.embedding_model, device="cpu")
-    dataset = TrajectoryDataset([args.train_data], embedder, args.cache)
-    dim = dataset.encoded[0]["u"].shape[-1]
-    train_len = max(1, int(len(dataset) * 0.9))
-    val_len = len(dataset) - train_len
-    train_ds, val_ds = random_split(dataset, [train_len, val_len], generator=torch.Generator().manual_seed(args.seed))
-    train_loader = DataLoader(train_ds, batch_size=args.batch_size, shuffle=True)
-    val_loader = DataLoader(val_ds, batch_size=args.batch_size)
-    ssm = NeuralStateSpaceModel(dim, args.ssm_hidden).to(device)
-    nbf = NeuralBarrierFunction(dim, args.nbf_hidden).to(device)
-    opt_ssm = torch.optim.Adam(ssm.parameters(), lr=args.ssm_lr)
-    mse = nn.MSELoss(reduction="none")
-    out_dir = Path(args.out_dir)
-    out_dir.mkdir(parents=True, exist_ok=True)
-
-    for epoch in range(args.ssm_epochs):
-        ssm.train()
-        total = 0.0
-        for u, z, labels, mask, _ in train_loader:
-            u, z, mask = u.to(device), z.to(device), mask.to(device)
-            z_hat, _, _ = rollout(ssm, nbf, u)
-            loss = (mse(z_hat, z).mean(-1) * mask).sum() / mask.sum().clamp_min(1)
-            opt_ssm.zero_grad()
-            loss.backward()
-            opt_ssm.step()
-            total += loss.item()
-        print(f"ssm_epoch={epoch+1} loss={total / max(1, len(train_loader)):.6f}", flush=True)
-
-    opt_nbf = torch.optim.Adam(nbf.parameters(), lr=args.nbf_lr)
-    ce = nn.CrossEntropyLoss(reduction="none")
-    for epoch in range(args.nbf_epochs):
-        ssm.eval()
-        nbf.train()
-        total = 0.0
-        for u, z, labels, mask, _ in train_loader:
-            u, labels, mask = u.to(device), labels.to(device), mask.to(device)
-            with torch.no_grad():
-                _, _, _ = rollout(ssm, nbf, u)
-            _, logits, next_logits = rollout(ssm, nbf, u)
-            ce_loss = (ce(logits.reshape(-1, 5), labels.reshape(-1)).reshape_as(mask) * mask).sum() / mask.sum().clamp_min(1)
-            ss_loss = safe_set_loss(logits, labels, mask, args.train_eta)
-            si_loss = invariance_loss(next_logits, mask, args.train_eta, args.kappa)
-            loss = ce_loss + args.safe_weight * ss_loss + args.invariance_weight * si_loss
-            opt_nbf.zero_grad()
-            loss.backward()
-            opt_nbf.step()
-            total += loss.item()
-        print(f"nbf_epoch={epoch+1} loss={total / max(1, len(train_loader)):.6f}", flush=True)
-
-    torch.save({
-        "ssm": ssm.state_dict(),
-        "nbf": nbf.state_dict(),
-        "embedding_dim": dim,
-        "ssm_hidden": args.ssm_hidden,
-        "nbf_hidden": args.nbf_hidden,
-        "embedding_model": args.embedding_model,
-        "kappa": args.kappa,
-        "guard_model_params_M": args.guard_model_params_m,
-    }, out_dir / "nbf_model.pt")
-
-
-def predict(args):
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    ckpt = torch.load(args.model_path, map_location=device)
-    embedder = SentenceTransformer(ckpt["embedding_model"], device="cpu")
-    dataset = TrajectoryDataset([args.input_data], embedder, args.cache)
-    dim = ckpt["embedding_dim"]
-    ssm = NeuralStateSpaceModel(dim, ckpt["ssm_hidden"]).to(device)
-    nbf = NeuralBarrierFunction(dim, ckpt["nbf_hidden"]).to(device)
-    ssm.load_state_dict(ckpt["ssm"])
-    nbf.load_state_dict(ckpt["nbf"])
-    ssm.eval()
-    nbf.eval()
+def benign_training_dialogues(benign_score: int, harmful_score: int) -> list[dict]:
+    """Optional extra training dialogues from the visible benign *train* prompts (no responses)."""
     out = []
-    with torch.no_grad():
-        for row in dataset.encoded:
-            x = torch.zeros(1, dim, device=device)
-            turns = []
-            for turn_idx in range(row["u"].shape[0]):
-                u = row["u"][turn_idx].unsqueeze(0).to(device)
-                logits = nbf(x, u)
-                margin = barrier_margin(logits).item()
-                pred = int(logits.argmax(-1).item()) + 1
-                filtered = margin + args.threshold >= 0
-                if filtered:
-                    state_advanced = False
-                else:
-                    x, _ = ssm(x, u)
-                    state_advanced = True
-                turns.append({
-                    "turn": turn_idx + 1,
-                    "attack": row["attack"],
-                    "true_score": int(row["labels"][turn_idx].item()) + 1,
-                    "pred_score": pred,
-                    "barrier_margin": margin,
-                    "filtered": bool(filtered),
-                    "state_advanced": state_advanced,
-                })
-            out.append({"id": row["id"], "split": row["split"], "attack": row["attack"], "turns": turns})
-    Path(args.output).parent.mkdir(parents=True, exist_ok=True)
-    Path(args.output).write_text(json.dumps({
-        "threshold": args.threshold,
-        "guard_model_params_M": ckpt.get("guard_model_params_M"),
-        "dialogues": out,
-    }, indent=2) + "\n", encoding="utf-8")
+    for item in load_benign("train"):
+        scores = [harmful_score if tag["label"] == "harmful" else benign_score for tag in item["tags"]]
+        out.append({"id": item["id"], "family": "benign", "u": item["u"], "y": None,
+                    "scores": torch.tensor(scores, dtype=torch.long)})
+    return out
+
+
+def batches(n: int, batch_size: int, generator: torch.Generator):
+    perm = torch.randperm(n, generator=generator)
+    for i in range(0, n, batch_size):
+        yield perm[i : i + batch_size]
+
+
+# --------------------------------------------------------------------------- stage 1
+
+def ssm_rollout(ssm, u):
+    x = torch.zeros(u.shape[0], u.shape[-1], device=u.device)
+    preds = []
+    for t in range(u.shape[1]):
+        x, z = ssm(x, u[:, t])
+        preds.append(z)
+    return torch.stack(preds, 1)
+
+
+def train_ssm(args) -> None:
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    torch.manual_seed(args.seed)
+    gen = torch.Generator().manual_seed(args.seed)
+    u, y, _, mask = tensors("train", device)
+    vu, vy, _, vmask = tensors("dev", device)
+    ssm = NeuralStateSpaceModel(DIM, DIM, DIM, args.hidden).to(device)
+    opt = torch.optim.Adam(ssm.parameters(), lr=args.lr)
+    mse = nn.MSELoss()
+    out = Path(args.out)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    best = float("inf")
+    m3, vm3 = mask.unsqueeze(-1), vmask.unsqueeze(-1)
+    for epoch in range(args.epochs):
+        ssm.train()
+        total, nb = 0.0, 0
+        t0 = time.time()
+        for idx in batches(u.shape[0], args.batch_size, gen):
+            pred = ssm_rollout(ssm, u[idx])
+            loss = mse(pred * m3[idx], y[idx] * m3[idx])
+            opt.zero_grad()
+            loss.backward()
+            opt.step()
+            total, nb = total + loss.item(), nb + 1
+        ssm.eval()
+        with torch.no_grad():
+            vl, vn = 0.0, 0
+            for i in range(0, vu.shape[0], args.batch_size):
+                sl = slice(i, i + args.batch_size)
+                vl += mse(ssm_rollout(ssm, vu[sl]) * vm3[sl], vy[sl] * vm3[sl]).item()
+                vn += 1
+            vl /= max(1, vn)
+        if vl < best:
+            best = vl
+            torch.save({"ssm": ssm.state_dict(), "hidden": args.hidden, "epoch": epoch + 1, "val_mse": vl}, out)
+        print(f"ssm epoch {epoch + 1}/{args.epochs} train {total / max(1, nb):.6f} val {vl:.6f} best {best:.6f} ({time.time() - t0:.1f}s)", flush=True)
+
+
+# --------------------------------------------------------------------------- stage 2
+
+def nbf_forward(ssm, nbf, u):
+    """Return (logits [B,T,5], next-state logits [B,T,5]) exactly as the authors' loop."""
+    b, steps, _ = u.shape
+    x = torch.zeros(b, u.shape[-1], device=u.device)
+    preds, preds_next = [], []
+    for t in range(steps):
+        x_prev = x
+        with torch.no_grad():  # dynamics are frozen in stage 2
+            x, _ = ssm(x_prev, u[:, t])
+        u_next = u[:, t + 1] if t < steps - 1 else u[:, t]
+        preds.append(nbf(x_prev, u[:, t]))
+        preds_next.append(nbf(x, u_next))
+    return torch.stack(preds, 1), torch.stack(preds_next, 1)
+
+
+def nbf_losses(ssm, nbf, u, labels, mask, kappa):
+    logits, logits_next = nbf_forward(ssm, nbf, u)
+    fi_mask = torch.zeros_like(mask)
+    fi_mask[:, :-kappa] = mask[:, kappa:]
+    m = mask.unsqueeze(-1)
+    # Authors' masked cross entropy: padded positions contribute zero logits and label 0.
+    ce = nn.functional.cross_entropy((logits * m).reshape(-1, NUM_CLASSES), (labels * mask.long()).reshape(-1))
+    si = loss_forward_invariance(logits_next, fi_mask)
+    ss = loss_forward_invariance(logits, mask, labels)
+    return ce, si, ss
+
+
+def train_nbf(args) -> None:
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    torch.manual_seed(args.seed)
+    gen = torch.Generator().manual_seed(args.seed)
+    extra = benign_training_dialogues(args.benign_score, args.harmful_score) if args.benign_train else None
+    u, _, labels, mask = tensors("train", device, extra)
+    vu, _, vlabels, vmask = tensors("dev", device)
+    ssm_ckpt = torch.load(args.ssm, map_location=device)
+    ssm = NeuralStateSpaceModel(DIM, DIM, DIM, ssm_ckpt["hidden"]).to(device)
+    ssm.load_state_dict(ssm_ckpt["ssm"])
+    ssm.eval()
+    for p in ssm.parameters():
+        p.requires_grad_(False)
+    nbf = NeuralBarrierFunction(DIM, DIM, args.hidden).to(device)
+    opt = torch.optim.Adam(nbf.parameters(), lr=args.lr)
+    out = Path(args.out)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    best = float("inf")
+    for epoch in range(args.epochs):
+        nbf.train()
+        sums = torch.zeros(4)
+        nb = 0
+        for idx in batches(u.shape[0], args.batch_size, gen):
+            ce, si, ss = nbf_losses(ssm, nbf, u[idx], labels[idx], mask[idx], args.kappa)
+            loss = ce + args.si_weight * si + args.ss_weight * ss
+            opt.zero_grad()
+            loss.backward()
+            opt.step()
+            sums += torch.tensor([loss.item(), ce.item(), si.item(), ss.item()])
+            nb += 1
+        nbf.eval()
+        with torch.no_grad():
+            vce, vn = 0.0, 0
+            for i in range(0, vu.shape[0], args.batch_size):
+                sl = slice(i, i + args.batch_size)
+                ce, _, _ = nbf_losses(ssm, nbf, vu[sl], vlabels[sl], vmask[sl], args.kappa)
+                vce += ce.item()
+                vn += 1
+            vce /= max(1, vn)
+        if vce < best:
+            best = vce
+            torch.save(
+                {"ssm": ssm.state_dict(), "nbf": nbf.state_dict(), "ssm_hidden": ssm_ckpt["hidden"],
+                 "nbf_hidden": args.hidden, "epoch": epoch + 1, "val_ce": vce,
+                 "config": {k: v for k, v in vars(args).items() if k != "func"}},
+                out,
+            )
+        s = sums / max(1, nb)
+        print(f"nbf epoch {epoch + 1}/{args.epochs} loss {s[0]:.4f} ce {s[1]:.4f} si {s[2]:.4f} ss {s[3]:.4f} val_ce {vce:.4f} best {best:.4f}", flush=True)
+
+
+# --------------------------------------------------------------------------- export
+
+class NBFGuard(nn.Module):
+    """TorchScript guard: score = h(x_{k-1}, u_k) + eta, next_state = f(x_{k-1}, u_k)."""
+
+    def __init__(self, ssm: NeuralStateSpaceModel, nbf: NeuralBarrierFunction, eta: float):
+        super().__init__()
+        self.ssm = ssm
+        self.nbf = nbf
+        self.register_buffer("eta", torch.tensor(float(eta)))
+        self.register_buffer("initial_state", torch.zeros(DIM))
+
+    def forward(self, state: torch.Tensor, u: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+        probs = torch.softmax(self.nbf(state, u), dim=-1)
+        margin = probs[:, -1] - probs[:, :-1].max(dim=-1).values
+        next_state, _ = self.ssm(state, u)
+        return margin + self.eta, next_state
+
+
+class _Pair(nn.Module):
+    def __init__(self, ssm: NeuralStateSpaceModel, nbf: NeuralBarrierFunction):
+        super().__init__()
+        self.ssm = ssm
+        self.nbf = nbf
+
+    def forward(self, x: torch.Tensor, u: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+        probs = torch.softmax(self.nbf(x, u), dim=-1)
+        margin = probs[:, -1] - probs[:, :-1].max(dim=-1).values
+        nx, _ = self.ssm(x, u)
+        return margin, nx
+
+
+class NBFEnsembleGuard(nn.Module):
+    """Average barrier margin over independently trained (dynamics, barrier) pairs."""
+
+    def __init__(self, ssms: list, nbfs: list, eta: float):
+        super().__init__()
+        self.pairs = nn.ModuleList([_Pair(s, n) for s, n in zip(ssms, nbfs)])
+        self.k = len(ssms)
+        self.register_buffer("eta", torch.tensor(float(eta)))
+        self.register_buffer("initial_state", torch.zeros(DIM * len(ssms)))
+
+    def forward(self, state: torch.Tensor, u: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+        parts = torch.chunk(state, self.k, dim=-1)
+        margins = []
+        nexts = []
+        for i, pair in enumerate(self.pairs):
+            m, nx = pair(parts[i], u)
+            margins.append(m)
+            nexts.append(nx)
+        return torch.stack(margins, 0).mean(0) + self.eta, torch.cat(nexts, dim=-1)
+
+
+def load_pair(path):
+    ckpt = torch.load(path, map_location="cpu")
+    ssm = NeuralStateSpaceModel(DIM, DIM, DIM, ckpt["ssm_hidden"])
+    ssm.load_state_dict(ckpt["ssm"])
+    nbf = NeuralBarrierFunction(DIM, DIM, ckpt["nbf_hidden"])
+    nbf.load_state_dict(ckpt["nbf"])
+    return ssm.eval(), nbf.eval()
+
+
+def export(args) -> None:
+    pairs = [load_pair(p) for p in args.model]
+    if len(pairs) == 1:
+        guard = NBFGuard(pairs[0][0], pairs[0][1], args.eta)
+    else:
+        guard = NBFEnsembleGuard([p[0] for p in pairs], [p[1] for p in pairs], args.eta)
+    scripted = torch.jit.script(guard.eval())
+    Path(args.out).parent.mkdir(parents=True, exist_ok=True)
+    scripted.save(args.out)
+    n = sum(p.numel() for p in guard.parameters())
+    print(f"exported {args.out} (eta={args.eta}, {n / 1e6:.3f}M parameters)")
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    sub = parser.add_subparsers(dest="cmd", required=True)
+    p = sub.add_parser("train-ssm")
+    p.add_argument("--out", default="checkpoints/nbf/ssm_seed0.pt")
+    p.add_argument("--hidden", type=int, default=512)
+    p.add_argument("--epochs", type=int, default=200)
+    p.add_argument("--batch-size", type=int, default=64)
+    p.add_argument("--lr", type=float, default=1e-4)
+    p.add_argument("--seed", type=int, default=0)
+    p.set_defaults(func=train_ssm)
+    p = sub.add_parser("train-nbf")
+    p.add_argument("--ssm", default="checkpoints/nbf/ssm_seed0.pt")
+    p.add_argument("--out", default="checkpoints/nbf/nbf_seed0.pt")
+    p.add_argument("--hidden", type=int, default=32)
+    p.add_argument("--epochs", type=int, default=200)
+    p.add_argument("--batch-size", type=int, default=64)
+    p.add_argument("--lr", type=float, default=1e-3)
+    p.add_argument("--kappa", type=int, default=3)
+    p.add_argument("--si-weight", type=float, default=100.0)
+    p.add_argument("--ss-weight", type=float, default=100.0)
+    p.add_argument("--seed", type=int, default=0)
+    p.add_argument("--benign-train", action="store_true",
+                   help="also train on data/benign train prompts (variant; not the paper's setting)")
+    p.add_argument("--benign-score", type=int, default=1)
+    p.add_argument("--harmful-score", type=int, default=5)
+    p.set_defaults(func=train_nbf)
+    p = sub.add_parser("export")
+    p.add_argument("--model", nargs="+", required=True)
+    p.add_argument("--eta", type=float, default=1e-3)
+    p.add_argument("--out", required=True)
+    p.set_defaults(func=export)
+    args = parser.parse_args()
+    args.func(args)
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    sub = parser.add_subparsers(dest="cmd", required=True)
-    p_train = sub.add_parser("train")
-    p_train.add_argument("--train-data", default="data/local_dialogues/train.jsonl")
-    p_train.add_argument("--embedding-model", default="data/downloads/all-MiniLM-L6-v2")
-    p_train.add_argument("--cache", default="tmp/train_embeddings.pt")
-    p_train.add_argument("--out-dir", default="checkpoints/nbf")
-    p_train.add_argument("--ssm-hidden", type=int, default=256)
-    p_train.add_argument("--nbf-hidden", type=int, default=32)
-    p_train.add_argument("--ssm-epochs", type=int, default=16)
-    p_train.add_argument("--nbf-epochs", type=int, default=24)
-    p_train.add_argument("--batch-size", type=int, default=64)
-    p_train.add_argument("--ssm-lr", type=float, default=1e-4)
-    p_train.add_argument("--nbf-lr", type=float, default=1e-3)
-    p_train.add_argument("--safe-weight", type=float, default=100.0)
-    p_train.add_argument("--invariance-weight", type=float, default=100.0)
-    p_train.add_argument("--train-eta", type=float, default=0.0)
-    p_train.add_argument("--kappa", type=int, default=3)
-    p_train.add_argument("--guard-model-params-m", type=float, default=23.1)
-    p_train.add_argument("--seed", type=int, default=13)
-    p_pred = sub.add_parser("predict")
-    p_pred.add_argument("--model-path", default="checkpoints/nbf/nbf_model.pt")
-    p_pred.add_argument("--input-data", required=True)
-    p_pred.add_argument("--cache", default=None)
-    p_pred.add_argument("--threshold", type=float, default=0.001)
-    p_pred.add_argument("--output", required=True)
-    args = parser.parse_args()
-    if args.cmd == "train":
-        train(args)
-    else:
-        predict(args)
+    main()

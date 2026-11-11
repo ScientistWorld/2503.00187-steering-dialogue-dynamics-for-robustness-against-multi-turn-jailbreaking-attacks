@@ -1,11 +1,6 @@
 #!/bin/bash
+# Run every TorchScript guard in tmp/outputs/guards/ on the hidden test inputs held in
+# eval/test/data and write scoring/scores_test.json. Never imports method/, never retrains.
 set -euo pipefail
-
-cd /home/user
-
-# Evaluate the held-out test slice from saved method outputs only. When the
-# train scores exist, the test scorer requires exactly the same method entries.
-python eval/test/evaluate.py \
-  --output-dir tmp/outputs \
-  --method-set-from scoring/scores_train.json \
-  --scores scoring/scores_test.json
+cd "$(dirname "$0")/.."
+python eval/test/evaluate.py --guard-dir tmp/outputs/guards --scores scoring/scores_test.json

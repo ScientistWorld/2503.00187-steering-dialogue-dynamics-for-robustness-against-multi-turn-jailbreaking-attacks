@@ -1,9 +1,6 @@
 #!/bin/bash
+# Run every TorchScript guard in tmp/outputs/guards/ on the visible dev split and
+# write scoring/scores_train.json. Never imports method/.
 set -euo pipefail
-
-cd /home/user
-
-# Evaluate the visible train slice from saved method outputs only.
-python eval/train/evaluate.py \
-  --output-dir tmp/outputs \
-  --scores scoring/scores_train.json
+cd "$(dirname "$0")/.."
+python eval/train/evaluate.py --guard-dir tmp/outputs/guards --scores scoring/scores_train.json
