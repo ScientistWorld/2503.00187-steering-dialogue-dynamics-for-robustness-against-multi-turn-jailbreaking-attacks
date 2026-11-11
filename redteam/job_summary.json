@@ -1,0 +1,23 @@
+{
+  "jobs": [
+    {
+      "id": "17095f08-a7c",
+      "exit_code": 0,
+      "purpose": "Initial 27 reference, quality, control and shortcut runs."
+    },
+    {
+      "id": "c2f094f7-5f1",
+      "exit_code": 1,
+      "purpose": "Follow-up interrupted after training by prediction-launcher variable collision; no successful test score claimed."
+    },
+    {
+      "id": "450b66ee-aa8",
+      "exit_code": 0,
+      "purpose": "Resumed checkpoint, completed three safe-transition seeds and the 200/200-epoch honest ablation."
+    }
+  ],
+  "successful_test_records": 28,
+  "failed_test_records": 3,
+  "protocol": "Each candidate invokes bash scripts/evaluate_train.sh then bash scripts/evaluate_test.sh without arguments in subprocesses. Shortcuts affect persisted files only, with no surviving helper process or evaluator/Python-environment modification.",
+  "restoration_base": "654cfc60059996bb12da7ab483c7976d20b44b59"
+}

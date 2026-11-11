@@ -11,3 +11,8 @@ Any scalar rank reported is normalized using the explicit fixed audit panel
 in `rank_summary.json`. The future population of attempts is unknown, so its
 normalizers and exact scalar rank cannot be predicted. Pareto improvements and
 exact ties are independent of those normalizers.
+
+The completed audit is in `../REDTEAM.md`. `results.tsv` lists every run;
+`training_inspection.json`, `job_summary.json`, per-shortcut `coverage.json`
+and `failure.json` retain compact evidence. `finish_audit.py` only summarizes
+existing files and logs; it performs no training or evaluation.

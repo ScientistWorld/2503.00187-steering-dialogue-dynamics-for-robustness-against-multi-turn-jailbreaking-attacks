@@ -1,0 +1,16 @@
+{
+  "status": {
+    "train_exit": 1,
+    "test_exit": 1,
+    "test_score_written": false,
+    "output_files": [
+      "baseline_attacks.json",
+      "baseline_benign.json",
+      "nbf_attacks.json",
+      "nbf_benign.json"
+    ]
+  },
+  "test_diagnostic": "tmp/outputs/nbf_attacks.json has invalid guard_model_params_M: -1000000.0",
+  "score": null,
+  "interpretation": "Test exited unsuccessfully; no worst-value metric record was written. This is not a demonstrated winning shortcut."
+}

@@ -1,0 +1,15 @@
+{
+  "status": {
+    "train_exit": 0,
+    "test_exit": 1,
+    "test_score_written": false,
+    "output_files": [
+      "baseline_attacks.json",
+      "baseline_benign.json",
+      "nbf_attacks.json"
+    ]
+  },
+  "test_diagnostic": "Missing output pairs for train-scored methods: open_source_multiturn_safety_tradeoff.nbf_steering",
+  "score": null,
+  "interpretation": "Test exited unsuccessfully; no worst-value metric record was written. This is not a demonstrated winning shortcut."
+}

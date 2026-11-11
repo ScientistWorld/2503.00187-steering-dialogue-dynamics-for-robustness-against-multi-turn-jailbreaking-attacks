@@ -1,0 +1,16 @@
+{
+  "attacks": {
+    "original_dialogues": 240,
+    "retained_dialogues": 8,
+    "original_turns": 1920,
+    "retained_turns": 64,
+    "used_turn_fallback": false
+  },
+  "benign": {
+    "original_dialogues": 180,
+    "retained_dialogues": 180,
+    "original_turns": 1440,
+    "retained_turns": 1440,
+    "used_turn_fallback": false
+  }
+}
