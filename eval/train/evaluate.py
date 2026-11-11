@@ -60,7 +60,7 @@ def dev_data():
     u = f16(CB / "u.f16", meta["n_turns"])
     attacks = [dict(id=d["id"], family=d["family"], scores=d["scores"], u=u[d["offset"] : d["offset"] + d["length"]])
                for d in meta["dialogues"] if d["split"] == "dev"]
-    rows = [json.loads(line) for line in (BENIGN / "benign_dev.jsonl").read_text(encoding="utf-8").splitlines()]
+    rows = [json.loads(line) for line in (BENIGN / "benign_dev.jsonl").read_text(encoding="utf-8").split("\n") if line.strip()]
     bu = f16(BENIGN / "benign_dev_u.f16", sum(r["length"] for r in rows))
     prompts = [dict(id=r["id"], tags=r["tags"], u=bu[r["offset"] : r["offset"] + r["length"]]) for r in rows]
     return attacks, prompts

@@ -95,7 +95,7 @@ def load_test_set():
          "u": hb_u[d["offset"] : d["offset"] + d["length"]]}
         for d in hb["dialogues"]
     ]
-    rows = [json.loads(x) for x in (DATA / "benign_test.jsonl").read_text(encoding="utf-8").splitlines()]
+    rows = [json.loads(x) for x in (DATA / "benign_test.jsonl").read_text(encoding="utf-8").split("\n") if x.strip()]
     b_u = read_f16(DATA / "benign_test_u.f16", sum(r["length"] for r in rows))
     benign = [
         {"id": r["id"], "tags": r["tags"], "u": b_u[r["offset"] : r["offset"] + r["length"]]}

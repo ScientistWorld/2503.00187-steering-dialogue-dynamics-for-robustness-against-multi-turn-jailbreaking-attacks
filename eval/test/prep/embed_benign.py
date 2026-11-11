@@ -28,7 +28,7 @@ def main() -> None:
     device = "cuda" if torch.cuda.is_available() else "cpu"
     model = SentenceTransformer(args.encoder, device=device)
     for path in map(Path, args.jsonl):
-        rows = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines()]
+        rows = [json.loads(line) for line in path.read_text(encoding="utf-8").split("\n") if line.strip()]
         texts = [t for r in rows for t in r["turns"]]
         emb = model.encode(texts, batch_size=64, convert_to_tensor=True, normalize_embeddings=True, show_progress_bar=False)
         emb = emb.float().cpu().to(torch.float16).contiguous()

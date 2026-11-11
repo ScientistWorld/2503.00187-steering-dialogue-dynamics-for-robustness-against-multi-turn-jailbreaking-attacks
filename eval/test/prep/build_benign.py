@@ -154,7 +154,7 @@ def write_jsonl(path: Path, rows: list[dict]) -> None:
         for row in rows:
             row = dict(row, offset=offset, length=len(row["turns"]))
             offset += len(row["turns"])
-            f.write(json.dumps(row, ensure_ascii=False) + "\n")
+            f.write(json.dumps(row) + "\n")
 
 
 def main() -> None:

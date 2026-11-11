@@ -31,7 +31,7 @@ SOURCES = ("mmlu", "mtbench", "xstest", "jbb")
 
 def load_labels():
     hb = json.loads((DATA / "hb_dialogues.json").read_text())
-    benign = [json.loads(x) for x in (DATA / "benign_test.jsonl").read_text().splitlines()]
+    benign = [json.loads(x) for x in (DATA / "benign_test.jsonl").read_text().split("\n") if x.strip()]
     return hb["dialogues"], benign
 
 

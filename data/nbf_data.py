@@ -90,7 +90,7 @@ def load_benign(split: str) -> list[dict]:
     MT-Bench turns; safety sessions ask one XSTest or JailbreakBench prompt after
     0-7 benign MMLU context turns.
     """
-    rows = [json.loads(line) for line in (BENIGN_DIR / f"benign_{split}.jsonl").read_text(encoding="utf-8").splitlines()]
+    rows = [json.loads(line) for line in (BENIGN_DIR / f"benign_{split}.jsonl").read_text(encoding="utf-8").split("\n") if line.strip()]
     n = sum(r["length"] for r in rows)
     u_all = read_f16(BENIGN_DIR / f"benign_{split}_u.f16", n)
     return [
