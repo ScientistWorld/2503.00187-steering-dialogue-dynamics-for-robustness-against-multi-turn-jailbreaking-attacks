@@ -17,71 +17,74 @@
       "nbf_steering": {
         "file": "tmp/outputs/guards/nbf_steering.pt",
         "guard_params": 2938342,
+        "memorized_fraction": 0.0,
         "diagnostics": {
           "family_asr": {
-            "acronym": 0.175,
-            "opposite_day": 0.48,
-            "crescendo": 0.35,
-            "actorattack": 0.1424731182795699
+            "acronym": 0.075,
+            "opposite_day": 0.265,
+            "crescendo": 0.14,
+            "actorattack": 0.08870967741935484
           },
-          "unsafe_turn_recall": 0.606508875739645,
-          "unsafe_turn_precision": 0.38533834586466165,
+          "unsafe_turn_recall": 0.7943786982248521,
+          "unsafe_turn_precision": 0.3596784996651038,
           "benign_filter_rate_by_source": {
-            "mmlu": 0.26,
-            "mtbench": 0.3,
-            "jbb": 0.2833333333333333,
-            "xstest": 0.25333333333333335
+            "mmlu": 0.225,
+            "mtbench": 0.11,
+            "jbb": 0.35,
+            "xstest": 0.22666666666666666
           },
-          "detection_recall": 0.39444444444444443,
-          "detection_precision": 0.5634920634920635
+          "detection_recall": 0.65,
+          "detection_precision": 0.6802325581395349
         },
-        "seconds": 24.8
+        "seconds": 22.2
       },
       "nbf_steering_eta0": {
         "file": "tmp/outputs/guards/nbf_steering_eta0.pt",
         "guard_params": 2938342,
+        "memorized_fraction": 0.0,
         "diagnostics": {
           "family_asr": {
-            "acronym": 0.52,
-            "opposite_day": 0.78,
-            "crescendo": 0.555,
-            "actorattack": 0.3575268817204301
+            "acronym": 0.155,
+            "opposite_day": 0.57,
+            "crescendo": 0.37,
+            "actorattack": 0.19623655913978494
           },
-          "unsafe_turn_recall": 0.14644970414201183,
-          "unsafe_turn_precision": 0.6226415094339622,
+          "unsafe_turn_recall": 0.5266272189349113,
+          "unsafe_turn_precision": 0.45817245817245816,
           "benign_filter_rate_by_source": {
-            "mmlu": 0.09666666666666666,
-            "mtbench": 0.16,
-            "jbb": 0.016666666666666666,
-            "xstest": 0.1
+            "mmlu": 0.07166666666666667,
+            "mtbench": 0.07,
+            "jbb": 0.18333333333333332,
+            "xstest": 0.13333333333333333
           },
-          "detection_recall": 0.07222222222222222,
-          "detection_precision": 0.4482758620689655
+          "detection_recall": 0.4888888888888889,
+          "detection_precision": 0.7394957983193278
         },
-        "seconds": 25.0
+        "seconds": 21.7
       },
       "single_turn_guard": {
         "file": "tmp/outputs/guards/single_turn_guard.pt",
         "guard_params": 25831,
+        "memorized_fraction": 0.0,
         "diagnostics": {
           "family_asr": {
-            "acronym": 0.275,
-            "opposite_day": 0.69,
-            "crescendo": 0.525,
-            "actorattack": 0.239247311827957
+            "acronym": 0.35,
+            "opposite_day": 0.66,
+            "crescendo": 0.46,
+            "actorattack": 0.1881720430107527
           },
-          "unsafe_turn_recall": 0.3772189349112426,
-          "unsafe_turn_precision": 0.5679287305122495,
+          "unsafe_turn_recall": 0.4230769230769231,
+          "unsafe_turn_precision": 0.6163793103448276,
           "benign_filter_rate_by_source": {
-            "mmlu": 0.04833333333333333,
-            "mtbench": 0.05,
-            "jbb": 0.05,
-            "xstest": 0.06666666666666667
+            "mmlu": 0.06166666666666667,
+            "mtbench": 0.02,
+            "jbb": 0.03333333333333333,
+            "xstest": 0.05333333333333334
           },
-          "detection_recall": 0.29444444444444445,
-          "detection_precision": 0.803030303030303
+          "detection_recall": 0.38333333333333336,
+          "detection_precision": 0.8734177215189873
         },
-        "seconds": 8.6
+        "seconds": 8.5
       }
     }
   },
@@ -89,41 +92,41 @@
     "multiturn_jailbreak_steering": {
       "results": {
         "nbf_steering": {
-          "asr": 0.32415770609318995,
-          "max_family_asr": 0.48,
-          "unsafe_turn_f1": 0.47126436781609193,
-          "safe_turn_filter_rate": 0.1588921282798834,
-          "helpfulness_retention": 0.72,
-          "over_refusal_rate": 0.2683333333333333
+          "asr": 0.1645698924731183,
+          "max_family_asr": 0.265,
+          "unsafe_turn_f1": 0.4951590594744122,
+          "safe_turn_filter_rate": 0.23226433430515064,
+          "helpfulness_retention": 0.8325,
+          "over_refusal_rate": 0.28833333333333333
         },
         "nbf_steering_eta0": {
-          "asr": 0.5641756272401434,
-          "max_family_asr": 0.78,
-          "unsafe_turn_f1": 0.237125748502994,
-          "safe_turn_filter_rate": 0.014577259475218658,
-          "helpfulness_retention": 0.8716666666666667,
-          "over_refusal_rate": 0.058333333333333334
+          "asr": 0.37874551971326165,
+          "max_family_asr": 0.57,
+          "unsafe_turn_f1": 0.49002064693737096,
+          "safe_turn_filter_rate": 0.10228377065111759,
+          "helpfulness_retention": 0.9291666666666667,
+          "over_refusal_rate": 0.15833333333333333
         },
         "single_turn_guard": {
-          "asr": 0.4847491039426523,
-          "max_family_asr": 0.69,
-          "unsafe_turn_f1": 0.4533333333333333,
-          "safe_turn_filter_rate": 0.047133138969873666,
-          "helpfulness_retention": 0.9508333333333333,
-          "over_refusal_rate": 0.058333333333333334
+          "asr": 0.4360573476702509,
+          "max_family_asr": 0.66,
+          "unsafe_turn_f1": 0.5017543859649123,
+          "safe_turn_filter_rate": 0.043245869776482024,
+          "helpfulness_retention": 0.9591666666666667,
+          "over_refusal_rate": 0.043333333333333335
         }
       }
     },
     "prompt_harmfulness_detection": {
       "results": {
         "nbf_steering": {
-          "prompt_harmfulness_f1": 0.46405228758169936
+          "prompt_harmfulness_f1": 0.6647727272727273
         },
         "nbf_steering_eta0": {
-          "prompt_harmfulness_f1": 0.12440191387559808
+          "prompt_harmfulness_f1": 0.5886287625418061
         },
         "single_turn_guard": {
-          "prompt_harmfulness_f1": 0.43089430894308944
+          "prompt_harmfulness_f1": 0.5328185328185329
         }
       }
     }
