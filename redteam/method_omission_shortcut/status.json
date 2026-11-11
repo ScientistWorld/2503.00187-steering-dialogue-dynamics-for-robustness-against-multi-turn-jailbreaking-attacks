@@ -1,0 +1,13 @@
+{
+  "train_exit": 0,
+  "test_exit": 0,
+  "test_score_written": true,
+  "output_files": [
+    "baseline_attacks.json",
+    "baseline_benign.json",
+    "nbf_attacks.json",
+    "nbf_benign.json",
+    "new_bad_method_attacks.json",
+    "new_bad_method_benign.json"
+  ]
+}

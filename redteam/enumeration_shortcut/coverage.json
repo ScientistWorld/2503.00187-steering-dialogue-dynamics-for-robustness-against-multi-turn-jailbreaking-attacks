@@ -1,0 +1,8 @@
+{
+  "train_turns": 5120,
+  "distinct_prompts": 1412,
+  "enumerated_generator_candidates": 7680,
+  "conflicting_train_labels": 0,
+  "unseen_test_and_benign_turns": 0,
+  "table_utf8_bytes": 253133
+}

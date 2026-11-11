@@ -1,0 +1,27 @@
+{
+  "seed": 13,
+  "ssm_epochs": 64,
+  "nbf_epochs": 96,
+  "extra": [],
+  "command": [
+    "/usr/local/bin/python",
+    "method/nbf_llm.py",
+    "train",
+    "--train-data",
+    "data/local_dialogues/train.jsonl",
+    "--embedding-model",
+    "data/downloads/all-MiniLM-L6-v2",
+    "--cache",
+    "tmp/train_embeddings.pt",
+    "--out-dir",
+    "/home/user/redteam/.state/checkpoints/better_training_96",
+    "--ssm-epochs",
+    "64",
+    "--nbf-epochs",
+    "96",
+    "--batch-size",
+    "64",
+    "--seed",
+    "13"
+  ]
+}

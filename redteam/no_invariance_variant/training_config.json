@@ -1,0 +1,32 @@
+{
+  "seed": 13,
+  "ssm_epochs": 16,
+  "nbf_epochs": 24,
+  "extra": [
+    "--invariance-weight",
+    "0"
+  ],
+  "command": [
+    "/usr/local/bin/python",
+    "method/nbf_llm.py",
+    "train",
+    "--train-data",
+    "data/local_dialogues/train.jsonl",
+    "--embedding-model",
+    "data/downloads/all-MiniLM-L6-v2",
+    "--cache",
+    "tmp/train_embeddings.pt",
+    "--out-dir",
+    "/home/user/redteam/.state/checkpoints/no_invariance_variant",
+    "--ssm-epochs",
+    "16",
+    "--nbf-epochs",
+    "24",
+    "--batch-size",
+    "64",
+    "--seed",
+    "13",
+    "--invariance-weight",
+    "0"
+  ]
+}

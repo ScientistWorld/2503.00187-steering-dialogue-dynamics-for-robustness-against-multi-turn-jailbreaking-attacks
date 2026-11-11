@@ -1,8 +1,4 @@
-# Once you set action to 'submit' or 'done', STOP immediately.
-# Do NOT sleep, poll, or wait for jobs. The system reads this file
-# only after your turn ends.
-action: pending
-gpus: 0
+action: submit
+gpus: 1
 test: false
-milestone: core_claim
-notes: ""
+notes: "Bundled scoring audit: reference reruns with 3 seeds, longer and weaker training, baseline and degenerate controls, and 17 artifact/label/coverage shortcut probes; restore original outputs afterward."
